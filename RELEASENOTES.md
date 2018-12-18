@@ -1,3 +1,8 @@
+## 3.1.0
+
+* split off from mulle-allocator and moved to mulle-core
+
+
 ### 3.0.18
 
 * fix type warning for sure now
