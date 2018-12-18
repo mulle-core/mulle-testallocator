@@ -1,5 +1,5 @@
-#ifndef mulle_allocator_include_h__
-#define mulle_allocator_include_h__
+#ifndef mulle_testallocator_include_h__
+#define mulle_testallocator_include_h__
 
 /* This is a central include file to keep dependencies out of the library
    C files. It is usally included by .h files only.
@@ -19,7 +19,7 @@
    sourcetree, then you don't need it.
  */
 
-#include "_mulle-allocator-include.h"
+#include "_mulle-testallocator-include.h"
 
 /* You can add some more include statements here */
 

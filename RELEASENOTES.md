@@ -1,3 +1,8 @@
+## 3.1.0
+
+* split off from mulle-allocator and moved to mulle-core
+
+
 ### 3.0.18
 
 * fix type warning for sure now
@@ -153,8 +158,8 @@ README.md for background.
 1.8.0
 ===
 
-* to make it more painless on windows, let `mulle_test_allocator_reset` call
-`mulle_test_allocator_initialize` if needed.
+* to make it more painless on windows, let `mulle_testallocator_reset` call
+`mulle_testallocator_initialize` if needed.
 
 
 1.7.3-1.7.11
