@@ -33,8 +33,21 @@ write
 ```
 
 Now you can easily check for leaks using the `mulle_testallocator` library.
+Just run your code with the environment variable MULLE_TESTALLOCATOR_ENABLED
+set to YES.
+mulle-testallocator will tell you your leaks when the executable exits.
 
-Wrap your code inside
+> This feature needs a C-compiler that handles `__attribute__(((constructor))`.
+>
+> The order of constructor and atexit calls is dependent on the link order.
+> To catch all leaks, it is advantageous to link mulle-testallocator ahead of
+> all other code. You should also use [whole archive linking](https://stackoverflow.com/questions/25038974/force-load-linker-flag-for-other-platforms) as otherwise the
+> library may just be omitted from the link.
+
+
+#### Manual method
+
+Or you can wrap your code inside the following piece of code:
 
 ```
 mulle_testallocator_initialize();
@@ -50,6 +63,7 @@ mulle_testallocator_reset();
 ```
 
 and `mulle_testallocator_reset` will tell you about your leaks.
+
 All `mulle_testallocator` routines will check for erroneus frees and
 wrong pointers.
 
@@ -65,11 +79,12 @@ dependencies `mulle-sde dependency add https://github.com/mulle-c/mulle-testallo
 Install the requirements:
 
 
-Requirements                                              | Description
-----------------------------------------------------------|-----------------------
-[mulle-c11](//github.com/mulle-c/mulle-c11)               | Compiler glue, single header
-[mulle-allocator](//github.com/mulle-c/mulle-allocator)   | Memory allocation library
-[mulle-thread](//github.com/mulle-concurrent/mulle-thread)| Thread and lock glue
+Requirements                                                 | Description
+-------------------------------------------------------------|-----------------------
+[mulle-c11](//github.com/mulle-c/mulle-c11)                  | Compiler glue, single header
+[mulle-allocator](//github.com/mulle-c/mulle-allocator)      | Memory allocation library
+[mulle-thread](//github.com/mulle-concurrent/mulle-thread)   | Thread and lock glue
+[mulle-stacktrace](//github.com/mulle-core/mulle-stracktrace)| Stacktrace support glue
 
 
 Install with

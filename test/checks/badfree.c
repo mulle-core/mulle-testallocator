@@ -8,6 +8,10 @@ static void  run_test( void)
 }
 
 
+//
+// run tests in manual mode, since the compiler might not support
+// constructors
+//
 int  main( int argc, char *argv[])
 {
    mulle_testallocator_initialize();
