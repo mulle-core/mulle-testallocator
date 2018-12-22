@@ -78,4 +78,4 @@ if( LINK_MANIFEST)
 
 endif()
 
-include( LinkManifestCAux OPTIONAL)
+include( LinkManifestAuxC OPTIONAL)

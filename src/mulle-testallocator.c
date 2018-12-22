@@ -350,6 +350,37 @@ void   _mulle_testallocator_detect_leaks()
 //
 // TODO: MULLE_C_CONSTRUCTOR doesn't work with non-clang compilers
 //
+static void   mulle_testallocator_exit()
+{
+   if( trace == -1)
+      return;
+
+   fprintf( stderr, "mulle_testallocator: start\n");
+   mulle_testallocator_reset();
+}
+
+static int   getenv_yes_no( char *name)
+{
+   char   *s;
+
+   s = getenv( name);
+   if( ! s)
+      return( 0);
+
+   switch( *s)
+   {
+   case '\0':
+   case 'f' :
+   case 'F' :
+   case 'n' :
+   case 'N' :
+   case '0' : return( 0);
+   }
+
+   return( 1);
+}
+
+
 MULLE_C_CONSTRUCTOR( mulle_testallocator_initialize)
 void   mulle_testallocator_initialize( void)
 {
@@ -362,11 +393,20 @@ void   mulle_testallocator_initialize( void)
    rval = mulle_thread_mutex_init( &alloc_lock);
    assert( ! rval);
 
+   if( getenv_yes_no( "MULLE_TESTALLOCATOR_ENABLED"))
+   {
+      fprintf( stderr, "mulle_testallocator: start\n");
+      // keep old aba, and fail
+      mulle_default_allocator.calloc  = test_calloc;
+      mulle_default_allocator.realloc = test_realloc;
+      mulle_default_allocator.free    = test_free;
+
+      atexit( mulle_testallocator_exit);
+   }
+
    s = getenv( "MULLE_TESTALLOCATOR_TRACE");
    mulle_testallocator_set_tracelevel( s ? atoi( s) : 0);
-
-   s = getenv( "MULLE_TESTALLOCATOR_DONT_FREE");
-   mulle_testallocator_config.dont_free = s ? atoi( s) : 0;
+   mulle_testallocator_config.dont_free = getenv_yes_no( "MULLE_TESTALLOCATOR_DONT_FREE");
 
    if( mulle_testallocator_config.dont_free && trace)
       fprintf( stderr, "mulle_testallocator: memory will not really be freed\n");
@@ -376,7 +416,7 @@ void   mulle_testallocator_initialize( void)
 void   mulle_testallocator_reset()
 {
    if( trace == -1)
-      mulle_testallocator_initialize();  // for windows, tests can get by calling
+      mulle_testallocator_initialize();   // for windows, tests can get by calling
                                           // mulle_testallocator_reset first
    if( mulle_thread_mutex_lock( &alloc_lock))
    {
@@ -389,5 +429,3 @@ void   mulle_testallocator_reset()
 
    mulle_thread_mutex_unlock( &alloc_lock);
 }
-
-

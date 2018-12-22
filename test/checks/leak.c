@@ -7,7 +7,10 @@ static void  run_test( void)
    mulle_malloc( 1848);  // just leak
 }
 
-
+//
+// run tests in manual mode, since the compiler might not support
+// constructors
+//
 int  main( int argc, char *argv[])
 {
    mulle_testallocator_initialize();
