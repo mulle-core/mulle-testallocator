@@ -1,12 +1,14 @@
 # mulle-testallocator
 
+🔄 C memory leak and double free checking
+
 mulle-testallocator is a leak and double free checker for tests
 (and at runtime). It builds upon [mulle-allocator](//mulle-c/mulle-allocator).
 
 
-Fork      |  Build Status | Release Version
-----------|---------------|-----------------------------------
-[Mulle kybernetiK](//github.com/mulle-c/mulle-testallocator) | [![Build Status](https://travis-ci.org/mulle-c/mulle-testallocator.svg?branch=release)](https://travis-ci.org/mulle-c/mulle-testallocator) | ![Mulle kybernetiK tag](https://img.shields.io/github/tag/mulle-c/mulle-testallocator.svg) [![Build Status](https://travis-ci.org/mulle-c/mulle-testallocator.svg?branch=release)](https://travis-ci.org/mulle-c/mulle-testallocator)
+Build Status | Release Version
+-------------|-----------------------------------
+[![Build Status](https://travis-ci.org/mulle-core/mulle-testallocator.svg?branch=release)](https://travis-ci.org/mulle-core/mulle-testallocator) | ![Mulle kybernetiK tag](https://img.shields.io/github/tag/mulle-core/mulle-testallocator.svg) [![Build Status](https://travis-ci.org/mulle-core/mulle-testallocator.svg?branch=release)](https://travis-ci.org/mulle-core/mulle-testallocator)
 
 ##  Use `mulle_testallocator` for leak detection
 
@@ -71,7 +73,7 @@ wrong pointers.
 ## Install
 
 Use [mulle-sde](//github.com/mulle-sde) to add mulle-testallocator to your
-dependencies `mulle-sde dependency add https://github.com/mulle-c/mulle-testallocator.git`.
+dependencies `mulle-sde dependency add https://github.com/mulle-core/mulle-testallocator.git`.
 
 
 ## Manual Installation
@@ -106,8 +108,8 @@ make install
 ### Platforms and Compilers
 
 All platforms and compilers supported by
-[mulle-c11](//www.mulle-kybernetik.com/software/git/mulle-c11/) and
-[mulle-thread](//www.mulle-kybernetik.com/software/git/mulle-thread/).
+[mulle-c11](//github.com/mulle-c/mulle-c11) and
+[mulle-thread](//github.com/mulle-concurrent/mulle-thread).
 
 
 ## Author

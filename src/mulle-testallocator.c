@@ -347,17 +347,7 @@ void   _mulle_testallocator_detect_leaks()
       bail( first_leak);
 }
 
-//
-// TODO: MULLE_C_CONSTRUCTOR doesn't work with non-clang compilers
-//
-static void   mulle_testallocator_exit()
-{
-   if( trace == -1)
-      return;
 
-   fprintf( stderr, "mulle_testallocator: start\n");
-   mulle_testallocator_reset();
-}
 
 static int   getenv_yes_no( char *name)
 {
@@ -381,6 +371,28 @@ static int   getenv_yes_no( char *name)
 }
 
 
+static void   trace_log( char *s)
+{
+   if( trace)
+     fprintf( stderr, "mulle_testallocator: %s\n", s);
+}
+
+//
+// TODO: MULLE_C_CONSTRUCTOR doesn't work with non-clang compilers
+//
+static void   mulle_testallocator_exit()
+{
+   if( trace == -1)
+      return;
+
+   // only display if enabled by environment
+   trace_log( "exit");
+
+   mulle_testallocator_reset();
+}
+
+
+
 MULLE_C_CONSTRUCTOR( mulle_testallocator_initialize)
 void   mulle_testallocator_initialize( void)
 {
@@ -393,9 +405,14 @@ void   mulle_testallocator_initialize( void)
    rval = mulle_thread_mutex_init( &alloc_lock);
    assert( ! rval);
 
+   s = getenv( "MULLE_TESTALLOCATOR_TRACE");
+   mulle_testallocator_set_tracelevel( s ? atoi( s) : 0);
+   mulle_testallocator_config.dont_free = getenv_yes_no( "MULLE_TESTALLOCATOR_DONT_FREE");
+
    if( getenv_yes_no( "MULLE_TESTALLOCATOR_ENABLED"))
    {
-      fprintf( stderr, "mulle_testallocator: start\n");
+      trace_log( "start");
+
       // keep old aba, and fail
       mulle_default_allocator.calloc  = test_calloc;
       mulle_default_allocator.realloc = test_realloc;
@@ -403,10 +420,6 @@ void   mulle_testallocator_initialize( void)
 
       atexit( mulle_testallocator_exit);
    }
-
-   s = getenv( "MULLE_TESTALLOCATOR_TRACE");
-   mulle_testallocator_set_tracelevel( s ? atoi( s) : 0);
-   mulle_testallocator_config.dont_free = getenv_yes_no( "MULLE_TESTALLOCATOR_DONT_FREE");
 
    if( mulle_testallocator_config.dont_free && trace)
       fprintf( stderr, "mulle_testallocator: memory will not really be freed\n");
@@ -418,14 +431,19 @@ void   mulle_testallocator_reset()
    if( trace == -1)
       mulle_testallocator_initialize();   // for windows, tests can get by calling
                                           // mulle_testallocator_reset first
+
+   trace_log( "lock");
    if( mulle_thread_mutex_lock( &alloc_lock))
    {
       perror( "mulle_thread_mutex_lock:");
       abort();
    }
 
+   trace_log( "reset");
+
    _mulle_testallocator_detect_leaks();
    _mulle_testallocator_reset();
 
+   trace_log( "unlock");
    mulle_thread_mutex_unlock( &alloc_lock);
 }
