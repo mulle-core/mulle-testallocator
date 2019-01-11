@@ -110,6 +110,20 @@ static void   bail( void *p)
 }
 
 
+static void   reused_pointer_assert( void *p)
+{
+   if( _pointerset_get( &allocations, p))
+   {
+      fprintf( stderr, "\n###\n### non-allocator freed block got reused: %p", p);
+      if( trace >= 3)
+         mulle_stacktrace( NULL, stderr);
+      fputc( '\n', stderr);
+
+      bail( p);
+   }
+}
+
+
 static void  *test_realloc( void *q, size_t size)
 {
    void   *p;
@@ -133,7 +147,7 @@ static void  *test_realloc( void *q, size_t size)
       if( ! old)
       {
          fprintf( stderr, "\n###\n### false realloc: %p", q);
-         if( trace > 1)
+         if( trace >= 3)
             mulle_stacktrace( NULL, stderr);
          fputc( '\n', stderr);
 
@@ -159,7 +173,7 @@ static void  *test_realloc( void *q, size_t size)
       {
          // just a normal malloc
          _pointerset_remove( &frees, p);
-         assert( ! _pointerset_get( &allocations, p));
+         reused_pointer_assert( p);
          _pointerset_add( &allocations, p, calloc, free);
       }
       else
@@ -173,20 +187,20 @@ static void  *test_realloc( void *q, size_t size)
             _pointerset_add( &frees, q, calloc, free);
 
             _pointerset_remove( &frees, p);
-            assert( ! _pointerset_get( &allocations, p));
+            reused_pointer_assert( p);
             _pointerset_add( &allocations, p, calloc, free);
          }
       }
       mulle_thread_mutex_unlock( &alloc_lock);
    }
 
-   if( trace)
+   if( trace >= 2)
    {
       if( q)
          fprintf( stderr, "realloced %p -> %p-%p", q, p, &((char *)p)[ size ? size - 1 : 0]);
       else
          fprintf( stderr, "alloced %p-%p", p, &((char *)p)[ size ? size - 1 : 0]);
-      if( trace > 1)
+      if( trace >= 3)
          mulle_stacktrace( NULL, stderr);
       fputc( '\n', stderr);
    }
@@ -215,15 +229,15 @@ static void  *test_calloc( size_t n, size_t size)
    }
 
    _pointerset_remove( &frees, p);
-   assert( ! _pointerset_get( &allocations, p));
+   reused_pointer_assert( p);
    _pointerset_add( &allocations, p, calloc, free);
 
    mulle_thread_mutex_unlock( &alloc_lock);
 
-   if( trace)
+   if( trace >= 2)
    {
       fprintf( stderr, "alloced %p-%p", p, &((char *)p)[ n * size ? n * size - 1 : 0]);
-      if( trace > 1)
+      if( trace >= 3)
          mulle_stacktrace( NULL, stderr);
       fputc( '\n', stderr);
    }
@@ -251,7 +265,7 @@ static void  test_free( void *p)
    if( q)
    {
       fprintf( stderr, "\n###\n### double free: %p", p);
-      if( trace > 1)
+      if( trace >= 3)
          mulle_stacktrace( NULL, stderr);
       fputc( '\n', stderr);
 
@@ -263,7 +277,7 @@ static void  test_free( void *p)
    if( ! q)
    {
       fprintf( stderr, "\n###\n### false free: %p", p);
-      if( trace > 1)
+      if( trace >= 3)
          mulle_stacktrace( NULL, stderr);
       fputc( '\n', stderr);
 
@@ -276,10 +290,10 @@ static void  test_free( void *p)
    if( ! mulle_testallocator_config.dont_free)
       free( p);
 
-   if( trace)
+   if( trace >= 2)
    {
       fprintf( stderr, "freed %p", p);  // analyzer: just an address print
-      if( trace > 1)
+      if( trace >= 3)
          mulle_stacktrace( NULL, stderr);
       fputc( '\n', stderr);
    }
@@ -303,9 +317,30 @@ struct mulle_allocator   mulle_testallocator =
 #pragma mark -
 #pragma mark reset allocator between tests
 
+static int   getenv_yes_no( char *name)
+{
+   char   *s;
+
+   s = getenv( name);
+   if( ! s)
+      return( 0);
+
+   switch( *s)
+   {
+   case '\0':
+   case 'f' :
+   case 'F' :
+   case 'n' :
+   case 'N' :
+   case '0' : return( 0);
+   }
+
+   return( 1);
+}
+
+
 void   mulle_testallocator_set_tracelevel( unsigned int value)
 {
-   assert( value <= 3);
    if( (int) value != trace && (trace != -1 || value))
       fprintf( stderr, "mulle_testallocator: trace level set to %d\n", value);
 
@@ -331,15 +366,22 @@ void   _mulle_testallocator_detect_leaks()
    struct _pointerset_enumerator   rover;
    void                            *p;
    void                            *first_leak;
+   int                             one_enough;
 
    first_leak = NULL;
+
+   one_enough = getenv_yes_no( "MULLE_TESTALLOCATOR_FIRST_LEAK");
 
    rover = _pointerset_enumerate( &allocations);
    while( p = _pointerset_enumerator_next( &rover))
    {
       fprintf( stderr, "### leak %p\n", p);
       if( ! first_leak)
+      {
          first_leak = p;
+         if( one_enough)
+            break;
+      }
    }
    _pointerset_enumerator_done( &rover);
 
@@ -348,33 +390,17 @@ void   _mulle_testallocator_detect_leaks()
 }
 
 
-
-static int   getenv_yes_no( char *name)
-{
-   char   *s;
-
-   s = getenv( name);
-   if( ! s)
-      return( 0);
-
-   switch( *s)
-   {
-   case '\0':
-   case 'f' :
-   case 'F' :
-   case 'n' :
-   case 'N' :
-   case '0' : return( 0);
-   }
-
-   return( 1);
-}
-
-
 static void   trace_log( char *s)
 {
    if( trace)
      fprintf( stderr, "mulle_testallocator: %s\n", s);
+}
+
+
+static void   trace_log_pointer( char *s, void *pointer)
+{
+   if( trace)
+     fprintf( stderr, "mulle_testallocator: %s (%p)\n", s, pointer);
 }
 
 //
@@ -409,15 +435,17 @@ void   mulle_testallocator_initialize( void)
    mulle_testallocator_set_tracelevel( s ? atoi( s) : 0);
    mulle_testallocator_config.dont_free = getenv_yes_no( "MULLE_TESTALLOCATOR_DONT_FREE");
 
-   if( getenv_yes_no( "MULLE_TESTALLOCATOR_ENABLED"))
+   if( getenv_yes_no( "MULLE_TESTALLOCATOR"))
    {
-      trace_log( "start");
+      trace_log_pointer( "start:     mulle_testallocator_initialize", &mulle_testallocator_initialize);
+      trace_log_pointer( "allocator: mulle_default_allocator", &mulle_default_allocator);
 
       // keep old aba, and fail
       mulle_default_allocator.calloc  = test_calloc;
       mulle_default_allocator.realloc = test_realloc;
       mulle_default_allocator.free    = test_free;
 
+      trace_log( "install atexit \"mulle_testallocator_exit\"");
       atexit( mulle_testallocator_exit);
    }
 
@@ -431,7 +459,6 @@ void   mulle_testallocator_reset()
    if( trace == -1)
       mulle_testallocator_initialize();   // for windows, tests can get by calling
                                           // mulle_testallocator_reset first
-
    trace_log( "lock");
    if( mulle_thread_mutex_lock( &alloc_lock))
    {

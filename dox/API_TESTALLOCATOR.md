@@ -32,6 +32,15 @@ Debug support can be turned on and off with environment variables
 
 Variable                         | Description
 -------------------------------- | ------------------------------------
-`MULLE_TESTALLOCATOR_TRACE`     | Trace allocations and deallocations. A value larger than 1, adds a stacktrace to the output (on participating platforms). A value larger than 2 increases the verbosity of the stacktrace.
-`MULLE_TESTALLOCATOR_DONT_FREE` | Memory is not actually freed, this can be useful, when reuse of memory makes the trace too confusing. Obviously this can burn memory away quickly.
+`MULLE_TESTALLOCATOR_ENABLE`     | Turn on automatic tracing during startup. (See below)
+`MULLE_TESTALLOCATOR_TRACE`      | Trace setup, allocations and deallocations. 1: trace setup and exit. 2: additionally traces allocations. 3: adds a stacktrace to the output (on participating platforms). A value larger than 3 increases the verbosity of the stacktrace.
+`MULLE_TESTALLOCATOR_DONT_FREE`  | Memory is not actually freed, this can be useful, when reuse of memory makes the trace too confusing. Obviously this can burn memory away quickly.
+`MULLE_TESTALLOCATOR_FIRST_LEAK` | Only report the first leak if set to 1 or YES.
 
+
+## Automatic startup is tricky and platform dependent
+
+For this to work, ensure that the mulle-testallocator is actually linked and
+incorporated wholesale. Also make sure the constructor function of
+mulle-testallocator is run as the very first. You may need to reorder
+linking of the library to the earliest or latest possible stage.

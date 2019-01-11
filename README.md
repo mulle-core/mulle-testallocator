@@ -35,7 +35,7 @@ write
 ```
 
 Now you can easily check for leaks using the `mulle_testallocator` library.
-Just run your code with the environment variable MULLE_TESTALLOCATOR_ENABLED
+Just run your code with the environment variable MULLE_TESTALLOCATOR
 set to YES.
 mulle-testallocator will tell you your leaks when the executable exits.
 
