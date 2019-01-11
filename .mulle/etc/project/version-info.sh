@@ -4,5 +4,5 @@
 # enough for you. If you don't have this file, there will be
 # not git operations.
 #
-# VERSIONFILE=
-# VERSIONNAME=
+VERSIONFILE="src/mulle-testallocator.h"
+VERSIONNAME="MULLE_TESTALLOCATOR_VERSION"

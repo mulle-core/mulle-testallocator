@@ -1,1 +1,1 @@
-mulle-testallocator;tar;no-import;058C665C-0FD6-47E8-84BD-681D62EFF5F3;${MULLE_TESTALLOCATOR_URL:-https://github.com/nat/mulle-testallocator/archive/${MULLE_TESTALLOCATOR_BRANCH:-latest}.tar.gz};;;;
+mulle-testallocator;tar;no-import,no-singlephase,no-static-link;058C665C-0FD6-47E8-84BD-681D62EFF5F3;${MULLE_TESTALLOCATOR_URL:-https://github.com/nat/mulle-testallocator/archive/${MULLE_TESTALLOCATOR_BRANCH:-latest}.tar.gz};;;;

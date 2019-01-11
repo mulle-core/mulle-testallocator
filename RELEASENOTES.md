@@ -1,3 +1,9 @@
+### 3.1.1
+
+* modernized to new mulle-test
+* modernized to mulle-sde with .mulle folder
+* up the convenience for tests with `MULLE_TESTALLOCATOR_ENABLED` envvar
+
 ## 3.1.0
 
 * split off from mulle-allocator and moved to mulle-core

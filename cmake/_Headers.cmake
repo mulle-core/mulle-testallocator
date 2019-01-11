@@ -7,7 +7,7 @@ endif()
 
 set( INCLUDE_DIRS
 src
-) 
+)
 
 set( PRIVATE_HEADERS
 src/include-private.h
@@ -20,5 +20,5 @@ src/mulle-testallocator-struct.h
 src/pointerarray.h
 src/pointerset.h
 src/version.h
-) 
+)
 
