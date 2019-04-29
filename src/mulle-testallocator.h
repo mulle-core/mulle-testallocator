@@ -47,10 +47,36 @@ MULLE_ALLOCATOR_EXTERN_GLOBAL struct _mulle_testallocator_config   mulle_testall
 MULLE_ALLOCATOR_EXTERN_GLOBAL struct mulle_allocator               mulle_testallocator;
 
 void   mulle_testallocator_initialize( void);
+void   mulle_testallocator_reset_detect_leaks( int detect);
+void   mulle_testallocator_set_tracelevel( unsigned int value); // 0,1,2 -1 turns off
 
-void   mulle_testallocator_reset( void);
-void   mulle_testallocator_set_tracelevel( unsigned int value); // 0,1,2
+//
+// the symbolizer parses the backtrace string and possibly improves it
+// return mulle_alloc string or input if unchanged
+//
+// We don't want to expose stacktrace here though, so we'd use a generic
+// functionpointer if that existed. Instead we just use a void one.
+//
+void   mulle_testallocator_set_stacktracesymbolizer( void (*f)( void));
 
+// start a clean sheet, without leak checking
+static inline void   mulle_testallocator_discard( void)
+{
+   mulle_testallocator_reset_detect_leaks( 0);
+}
+
+
+static inline void   mulle_testallocator_reset( void)
+{
+   mulle_testallocator_reset_detect_leaks( 1);
+}
+
+//
+// call this only once, you will have a hard time to reinitialize the
+// test allocator propery. Do this at the end of a test, if you used
+// mulle_testallocator_discard.
+//
+void   mulle_testallocator_cancel( void);
 
 // unlocked functions, rarely useful
 void   _mulle_testallocator_reset( void);

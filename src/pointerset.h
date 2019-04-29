@@ -135,6 +135,12 @@ static inline struct  _pointerset_enumerator   _pointerset_enumerate( struct _po
 {
    struct _pointerset_enumerator   rover;
 
+   if( ! set)
+   {
+      rover.curr = rover.sentinel = NULL;
+      return( rover);
+   }
+
    rover.curr     = &set->pointers[ 0];
    rover.sentinel = set->pointers ? &rover.curr[ set->mask + 1] : rover.curr;
 
