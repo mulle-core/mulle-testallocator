@@ -42,6 +42,7 @@
 #include <assert.h>
 #include <string.h>
 
+#pragma clang diagnostic ignored "-Wparentheses"
 
 // can not store null pointers, can not store (void *) -1
 

@@ -1,3 +1,12 @@
+# 4.0.0
+
+* added `MULLE_TESTALLOCATOR_LEAKS` environment variable
+* symbolizer support added
+* support for intermediate statistic resets improved
+* renamed `mulle_testallocator_reset` to  `mulle_testallocator_reset_detect_leaks`
+* added `mulle_testallocator_cancel`
+
+
 ### 3.1.1
 
 * modernized to new mulle-test
