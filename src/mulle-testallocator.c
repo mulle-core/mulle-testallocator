@@ -44,21 +44,43 @@
 #include <stdlib.h>
 
 
-#pragma clang diagnostic ignored "-Wparantheses"
+#pragma clang diagnostic ignored "-Wparentheses"
 
 #pragma mark -
 #pragma mark track allocations
 
 #include "pointerset.h"
 
-static struct _pointerset        allocations;
-static struct _pointerset        frees;
-static mulle_thread_mutex_t      alloc_lock;
-static int                       trace = -1;
-static struct mulle_stacktrace  stacktrace;
+
+// a mixture of values < 0 and bits > 0
+enum
+{
+   mulle_testallocator_trace_cancelled  = -2,
+   mulle_testallocator_trace_disabled   = -1,
+   mulle_testallocator_trace_none       = 0,
+   mulle_testallocator_trace_enabled    = 1,
+   mulle_testallocator_trace_verbose    = 2,
+   mulle_testallocator_trace_stacktrace = 4
+};
+
+enum
+{
+   mulle_testallocator_leak_only_one   = 1,  // only list one
+   mulle_testallocator_leak_dont_bail  = 2,  // don't abort on leaks
+};
 
 
-
+static struct 
+{
+   int                       trace;
+   mulle_thread_mutex_t      alloc_lock;
+   struct _pointerset        allocations;
+   struct _pointerset        frees;
+   struct mulle_stacktrace   stacktrace;
+} local = 
+{
+   mulle_testallocator_trace_disabled
+};
 
 //
 // unintialized data gets name mangled by cl.exe
@@ -74,7 +96,7 @@ MULLE_C_GLOBAL struct _mulle_testallocator_config    mulle_testallocator_config 
 
 static int   may_alloc( size_t size)
 {
-   assert( trace != -1 && "mulle_testallocator_initialize has not run yet");
+   assert( local.trace != mulle_testallocator_trace_disabled && "mulle_testallocator_initialize has not run yet");
 
    if( mulle_testallocator_config.out_of_memory)
       return( 0);
@@ -116,11 +138,11 @@ static void   bail( void *p)
 
 static void   reused_pointer_assert( void *p)
 {
-   if( _pointerset_get( &allocations, p))
+   if( _pointerset_get( &local.allocations, p))
    {
       fprintf( stderr, "\n###\n### non-allocator freed block got reused: %p", p);
-      if( trace >= 3)
-         mulle_stacktrace( &stacktrace, stderr);
+      if( local.trace & mulle_testallocator_trace_stacktrace)
+         mulle_stacktrace( &local.stacktrace, stderr);
       fputc( '\n', stderr);
 
       bail( p);
@@ -141,25 +163,25 @@ static void  *test_realloc( void *q, size_t size)
 
    if( q)
    {
-      if( trace != -2)
+      if( local.trace != mulle_testallocator_trace_cancelled)
       {
-         if( mulle_thread_mutex_lock( &alloc_lock))
+         if( mulle_thread_mutex_lock( &local.alloc_lock))
          {
             perror( "mulle_thread_mutex_lock:");
             abort();
          }
 
-         old = _pointerset_get( &allocations, q);
+         old = _pointerset_get( &local.allocations, q);
          if( ! old)
          {
             fprintf( stderr, "\n###\n### false realloc: %p", q);
-            if( trace >= 3)
-               mulle_stacktrace( &stacktrace, stderr);
+            if( local.trace & mulle_testallocator_trace_stacktrace)
+               mulle_stacktrace( &local.stacktrace, stderr);
             fputc( '\n', stderr);
 
             bail( q);
          }
-         mulle_thread_mutex_unlock( &alloc_lock);
+         mulle_thread_mutex_unlock( &local.alloc_lock);
       }
    }
 
@@ -170,9 +192,9 @@ static void  *test_realloc( void *q, size_t size)
    p = realloc( q, size);
    if( p)
    {
-      if( trace != -2)
+      if( local.trace != mulle_testallocator_trace_cancelled)
       {
-         if( mulle_thread_mutex_lock( &alloc_lock))
+         if( mulle_thread_mutex_lock( &local.alloc_lock))
          {
             perror( "mulle_thread_mutex_lock:");
             abort();
@@ -181,37 +203,37 @@ static void  *test_realloc( void *q, size_t size)
          if( ! q)
          {
             // just a normal malloc
-            _pointerset_remove( &frees, p);
+            _pointerset_remove( &local.frees, p);
             reused_pointer_assert( p);
-            _pointerset_add( &allocations, p, calloc, free);
+            _pointerset_add( &local.allocations, p, calloc, free);
          }
          else
          {
             // if p == q, then nothing happened
             if( p != q)
             {
-               assert( ! _pointerset_get( &frees, q));
-               assert( _pointerset_get( &allocations, q));
-               _pointerset_remove( &allocations, q); // just a pointere remove
-               _pointerset_add( &frees, q, calloc, free);
+               assert( ! _pointerset_get( &local.frees, q));
+               assert( _pointerset_get( &local.allocations, q));
+               _pointerset_remove( &local.allocations, q); // just a pointere remove
+               _pointerset_add( &local.frees, q, calloc, free);
 
-               _pointerset_remove( &frees, p);
+               _pointerset_remove( &local.frees, p);
                reused_pointer_assert( p);
-               _pointerset_add( &allocations, p, calloc, free);
+               _pointerset_add( &local.allocations, p, calloc, free);
             }
          }
-         mulle_thread_mutex_unlock( &alloc_lock);
+         mulle_thread_mutex_unlock( &local.alloc_lock);
       }
    }
 
-   if( trace >= 2)
+   if( local.trace & mulle_testallocator_trace_verbose)
    {
       if( q)
          fprintf( stderr, "realloced %p -> %p-%p", q, p, &((char *)p)[ size ? size - 1 : 0]);
       else
          fprintf( stderr, "alloced %p-%p", p, &((char *)p)[ size ? size - 1 : 0]);
-      if( trace >= 3)
-         mulle_stacktrace( &stacktrace, stderr);
+      if( local.trace & mulle_testallocator_trace_stacktrace)
+         mulle_stacktrace( &local.stacktrace, stderr);
       fputc( '\n', stderr);
    }
    return( p);
@@ -232,26 +254,26 @@ static void  *test_calloc( size_t n, size_t size)
    if( ! p)
       return( p);
 
-   if( trace != -2)
+   if( local.trace != mulle_testallocator_trace_cancelled)
    {
-      if( mulle_thread_mutex_lock( &alloc_lock))
+      if( mulle_thread_mutex_lock( &local.alloc_lock))
       {
          perror( "mulle_thread_mutex_lock:");
          abort();
       }
 
-      _pointerset_remove( &frees, p);
+      _pointerset_remove( &local.frees, p);
       reused_pointer_assert( p);
-      _pointerset_add( &allocations, p, calloc, free);
+      _pointerset_add( &local.allocations, p, calloc, free);
 
-      mulle_thread_mutex_unlock( &alloc_lock);
+      mulle_thread_mutex_unlock( &local.alloc_lock);
    }
 
-   if( trace >= 2)
+   if( local.trace & mulle_testallocator_trace_verbose)
    {
       fprintf( stderr, "alloced %p-%p", p, &((char *)p)[ n * size ? n * size - 1 : 0]);
-      if( trace >= 3)
-         mulle_stacktrace( &stacktrace, stderr);
+      if( local.trace & mulle_testallocator_trace_stacktrace)
+         mulle_stacktrace( &local.stacktrace, stderr);
       fputc( '\n', stderr);
    }
 
@@ -263,54 +285,54 @@ static void  test_free( void *p)
 {
    void   *q;
 
-   assert( trace != -1 && "mulle_testallocator_initialize has not run yet");
+   assert( local.trace != mulle_testallocator_trace_disabled && "mulle_testallocator_initialize has not run yet");
 
    if( ! p)
       return;
 
-   if( trace != -2)
+   if( local.trace != mulle_testallocator_trace_cancelled)
    {
-      if( mulle_thread_mutex_lock( &alloc_lock))
+      if( mulle_thread_mutex_lock( &local.alloc_lock))
       {
          perror( "mulle_thread_mutex_lock:");
          abort();
       }
 
-      q = _pointerset_get( &frees, p);
+      q = _pointerset_get( &local.frees, p);
       if( q)
       {
          fprintf( stderr, "\n###\n### double free: %p", p);
-         if( trace >= 3)
-            mulle_stacktrace( &stacktrace, stderr);
+         if( local.trace & mulle_testallocator_trace_stacktrace)
+            mulle_stacktrace( &local.stacktrace, stderr);
          fputc( '\n', stderr);
 
          bail( p);
       }
-      _pointerset_add( &frees, p, calloc, free);
+      _pointerset_add( &local.frees, p, calloc, free);
 
-      q = _pointerset_get( &allocations, p);
+      q = _pointerset_get( &local.allocations, p);
       if( ! q)
       {
          fprintf( stderr, "\n###\n### false free: %p", p);
-         if( trace >= 3)
-            mulle_stacktrace( &stacktrace, stderr);
+         if( local.trace & mulle_testallocator_trace_stacktrace)
+            mulle_stacktrace( &local.stacktrace, stderr);
          fputc( '\n', stderr);
 
          bail( p);
       }
-      _pointerset_remove( &allocations, q);
+      _pointerset_remove( &local.allocations, q);
 
-      mulle_thread_mutex_unlock( &alloc_lock);
+      mulle_thread_mutex_unlock( &local.alloc_lock);
    }
 
    if( ! mulle_testallocator_config.dont_free)
       free( p);
 
-   if( trace >= 2)
+   if( local.trace & mulle_testallocator_trace_verbose)
    {
       fprintf( stderr, "freed %p", p);  // analyzer: just an address print
-      if( trace >= 3)
-         mulle_stacktrace( &stacktrace, stderr);
+      if( local.trace & mulle_testallocator_trace_stacktrace)
+         mulle_stacktrace( &local.stacktrace, stderr);
       fputc( '\n', stderr);
    }
 }
@@ -357,30 +379,30 @@ static int   getenv_yes_no( char *name)
 
 void   mulle_testallocator_set_tracelevel( unsigned int value)
 {
-   if( (int) value != trace && (trace != -1 || value > 0))
-      fprintf( stderr, "mulle_testallocator: trace level set to %d\n", value);
+   if( (int) value != local.trace && (local.trace != mulle_testallocator_trace_disabled || (int) value > 0))
+      fprintf( stderr, "mulle_testallocator: local.trace level set to %d\n", value);
 
-   trace = value;
+   local.trace = value;
 }
 
 
 void   mulle_testallocator_set_stacktracesymbolizer( void (*f)( void))
 {
    assert( f);
-   stacktrace.symbolize = (mulle_stacktrace_symbolizer_t *) f;
+   local.stacktrace.symbolize = (mulle_stacktrace_symbolizer_t *) f;
 }
 
 
 void   _mulle_testallocator_reset()
 {
-   _pointerset_done( &allocations, free);
-   _pointerset_done( &frees, free);
+   _pointerset_done( &local.allocations, free);
+   _pointerset_done( &local.frees, free);
 
    mulle_testallocator_config.out_of_memory = 0;
    mulle_testallocator_config.max_size      = 0;
 
-   _pointerset_init( &allocations);
-   _pointerset_init( &frees);
+   _pointerset_init( &local.allocations);
+   _pointerset_init( &local.frees);
 }
 
 
@@ -389,43 +411,45 @@ void   _mulle_testallocator_detect_leaks()
    struct _pointerset_enumerator   rover;
    void                            *p;
    void                            *first_leak;
-   int                             one_enough;
+   int                             leakmode;
+   char                            *s;
 
-   if( trace == -2)
+   if( local.trace == mulle_testallocator_trace_cancelled)
       return;
 
    first_leak = NULL;
 
-   one_enough = getenv_yes_no( "MULLE_TESTALLOCATOR_FIRST_LEAK");
+   s        = getenv( "MULLE_TESTALLOCATOR_LEAKS");
+   leakmode = s ? atoi( s) : 0;
 
-   rover = _pointerset_enumerate( &allocations);
+   rover = _pointerset_enumerate( &local.allocations);
    while( p = _pointerset_enumerator_next( &rover))
    {
       fprintf( stderr, "### leak %p\n", p);
       if( ! first_leak)
       {
          first_leak = p;
-         if( one_enough)
+         if( leakmode & mulle_testallocator_leak_only_one)
             break;
       }
    }
    _pointerset_enumerator_done( &rover);
 
-   if( first_leak)
+   if( first_leak && ! (leakmode & mulle_testallocator_leak_dont_bail))
       bail( first_leak);
 }
 
 
 static void   trace_log( char *s)
 {
-   if( trace)
+   if( local.trace & mulle_testallocator_trace_enabled)
      fprintf( stderr, "mulle_testallocator: %s\n", s);
 }
 
 
 static void   trace_log_pointer( char *s, void *pointer)
 {
-   if( trace)
+   if( local.trace & mulle_testallocator_trace_enabled)
      fprintf( stderr, "mulle_testallocator: %s (%p)\n", s, pointer);
 }
 
@@ -434,11 +458,11 @@ static void   trace_log_pointer( char *s, void *pointer)
 //
 static void   mulle_testallocator_exit()
 {
-   if( trace == -1)
+   if( local.trace == mulle_testallocator_trace_disabled)
       return;
 
    // only display if enabled by environment
-   trace_log( "exit");
+   trace_log_pointer( "exit", (void *) mulle_testallocator_exit);
 
    mulle_testallocator_reset();
 }
@@ -451,10 +475,10 @@ void   mulle_testallocator_initialize( void)
    int    rval;
    char   *s;
 
-   if( trace != -1)
+   if( local.trace != mulle_testallocator_trace_disabled)
       return;
 
-   rval = mulle_thread_mutex_init( &alloc_lock);
+   rval = mulle_thread_mutex_init( &local.alloc_lock);
    assert( ! rval);
 
    s = getenv( "MULLE_TESTALLOCATOR_TRACE");
@@ -465,30 +489,31 @@ void   mulle_testallocator_initialize( void)
    {
       trace_log_pointer( "start:     mulle_testallocator_initialize", &mulle_testallocator_initialize);
       trace_log_pointer( "allocator: mulle_default_allocator", &mulle_default_allocator);
+      trace_log_pointer( "stdlib:    mulle_stdlib_allocator", &mulle_stdlib_allocator);
 
       // keep old aba, and fail
       mulle_default_allocator.calloc  = test_calloc;
       mulle_default_allocator.realloc = test_realloc;
       mulle_default_allocator.free    = test_free;
 
-      _mulle_stacktrace_init( &stacktrace, 0, 0, 0, 0);
+      _mulle_stacktrace_init( &local.stacktrace, 0, 0, 0, 0);
 
-      trace_log( "install atexit \"mulle_testallocator_exit\"");
-      atexit( mulle_testallocator_exit);
+      trace_log_pointer( "install atexit \"mulle_testallocator_exit\"", (void *) mulle_testallocator_exit);
+      mulle_atexit( mulle_testallocator_exit);
    }
 
-   if( mulle_testallocator_config.dont_free && trace)
+   if( mulle_testallocator_config.dont_free && local.trace)
       fprintf( stderr, "mulle_testallocator: memory will not really be freed\n");
 }
 
 
 void   mulle_testallocator_reset_detect_leaks( int detect)
 {
-   if( trace == -1)
+   if( local.trace == mulle_testallocator_trace_disabled)
       mulle_testallocator_initialize();   // for windows, tests can get by calling
                                           // mulle_testallocator_reset first
    trace_log( "lock");
-   if( mulle_thread_mutex_lock( &alloc_lock))
+   if( mulle_thread_mutex_lock( &local.alloc_lock))
    {
       perror( "mulle_thread_mutex_lock:");
       abort();
@@ -501,13 +526,13 @@ void   mulle_testallocator_reset_detect_leaks( int detect)
    _mulle_testallocator_reset();
 
    trace_log( "unlock");
-   mulle_thread_mutex_unlock( &alloc_lock);
+   mulle_thread_mutex_unlock( &local.alloc_lock);
 }
 
 
 void   mulle_testallocator_cancel( void)
 {
    mulle_testallocator_discard();
-   mulle_testallocator_set_tracelevel( -2);
+   mulle_testallocator_set_tracelevel( mulle_testallocator_trace_cancelled);
 }
 
