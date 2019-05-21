@@ -31,5 +31,13 @@ if( LINK_PHASE)
 endif()
 
 include( Library)
+
+# keep reference to mulle-allocator open, don't link
+if( LINK_PHASE AND APPLE)
+   if( BUILD_SHARED_LIBS)
+      target_link_libraries( "${LIBRARY_NAME}" "-undefined dynamic_lookup")
+   endif()
+endif()
+
 include( InstallLibrary)
 include( FinalOutput OPTIONAL)
