@@ -11,6 +11,7 @@ old/
 tmp/
 var/
 build/
+kitchen/
 build*.d/
 xcuserdata/
 project.xcworkspace/
@@ -43,6 +44,7 @@ environment-host-*.sh
 # stash is generally boring
 stash/
 build/
+kitchen/
 dependency/
 addiction/
 

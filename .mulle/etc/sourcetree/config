@@ -1,3 +1,4 @@
 mulle-thread;tar;no-all-load,no-import,no-singlephase;54AAE7DA-EEE2-47D9-8FB7-7054BC975048;${MULLE_THREAD_URL:-https://github.com/mulle-concurrent/mulle-thread/archive/${MULLE_THREAD_BRANCH:-latest}.tar.gz};;;;
 mulle-allocator;tar;no-all-load,no-import,no-singlephase;7D58C86B-1849-4379-905D-278855E61C94;${MULLE_ALLOCATOR_URL:-https://github.com/mulle-c/mulle-allocator/archive/${MULLE_ALLOCATOR_BRANCH:-latest}.tar.gz};;;;
 mulle-stacktrace;tar;no-all-load,no-import,no-singlephase;A459C99E-198C-4A39-8D1F-B9598CEDFEFC;${MULLE_STRACKTRACE_URL:-https://github.com/mulle-core/mulle-stacktrace/archive/${MULLE_ALLOCATOR_BRANCH:-latest}.tar.gz};;;;
+mulle-atexit;tar;no-all-load,no-import,no-singlephase;1ea2ae50-6aae-46bb-a41e-6638750270c7;${MULLE_ATEXIT_URL:-https://github.com/mulle-core/mulle-atexit/archive/${NODE_BRANCH}.tar.gz};${_BRANCH:-latest};;;

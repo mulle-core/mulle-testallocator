@@ -11,7 +11,7 @@ export MULLE_MATCH_PATH="${PROJECT_SOURCE_DIR}:CMakeLists.txt:cmake"
 
 
 # Used by `mulle-match find` to ignore boring subdirectories like .git
-export MULLE_MATCH_IGNORE_PATH=
+export MULLE_MATCH_IGNORE_PATH=""
 
 
 # tell mulle-sde to keep files protected from read/write changes

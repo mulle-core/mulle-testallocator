@@ -7,7 +7,7 @@ endif()
 
 # sourcetree: MULLE_THREAD;no-all-load,no-import,no-singlephase;
 if( NOT MULLE_THREAD_LIBRARY)
-   find_library( MULLE_THREAD_LIBRARY NAMES ${CMAKE_STATIC_LIBRARY_PREFIX}mulle-thread${CMAKE_STATIC_LIBRARY_SUFFIX} mulle-thread)
+   find_library( MULLE_THREAD_LIBRARY NAMES ${CMAKE_STATIC_LIBRARY_PREFIX}mulle-thread${CMAKE_STATIC_LIBRARY_SUFFIX} mulle-thread NO_CMAKE_SYSTEM_PATH)
    message( STATUS "MULLE_THREAD_LIBRARY is ${MULLE_THREAD_LIBRARY}")
    #
    # the order looks ascending, but due to the way this file is read
@@ -71,7 +71,7 @@ endif()
 
 # sourcetree: MULLE_ALLOCATOR;no-all-load,no-import,no-singlephase;
 if( NOT MULLE_ALLOCATOR_LIBRARY)
-   find_library( MULLE_ALLOCATOR_LIBRARY NAMES ${CMAKE_STATIC_LIBRARY_PREFIX}mulle-allocator${CMAKE_STATIC_LIBRARY_SUFFIX} mulle-allocator)
+   find_library( MULLE_ALLOCATOR_LIBRARY NAMES ${CMAKE_STATIC_LIBRARY_PREFIX}mulle-allocator${CMAKE_STATIC_LIBRARY_SUFFIX} mulle-allocator NO_CMAKE_SYSTEM_PATH)
    message( STATUS "MULLE_ALLOCATOR_LIBRARY is ${MULLE_ALLOCATOR_LIBRARY}")
    #
    # the order looks ascending, but due to the way this file is read
@@ -135,7 +135,7 @@ endif()
 
 # sourcetree: MULLE_STACKTRACE;no-all-load,no-import,no-singlephase;
 if( NOT MULLE_STACKTRACE_LIBRARY)
-   find_library( MULLE_STACKTRACE_LIBRARY NAMES ${CMAKE_STATIC_LIBRARY_PREFIX}mulle-stacktrace${CMAKE_STATIC_LIBRARY_SUFFIX} mulle-stacktrace)
+   find_library( MULLE_STACKTRACE_LIBRARY NAMES ${CMAKE_STATIC_LIBRARY_PREFIX}mulle-stacktrace${CMAKE_STATIC_LIBRARY_SUFFIX} mulle-stacktrace NO_CMAKE_SYSTEM_PATH)
    message( STATUS "MULLE_STACKTRACE_LIBRARY is ${MULLE_STACKTRACE_LIBRARY}")
    #
    # the order looks ascending, but due to the way this file is read
@@ -193,5 +193,69 @@ if( NOT MULLE_STACKTRACE_LIBRARY)
       endforeach()
    else()
       message( FATAL_ERROR "MULLE_STACKTRACE_LIBRARY was not found")
+   endif()
+endif()
+
+
+# sourcetree: MULLE_ATEXIT;no-all-load,no-import,no-singlephase;
+if( NOT MULLE_ATEXIT_LIBRARY)
+   find_library( MULLE_ATEXIT_LIBRARY NAMES ${CMAKE_STATIC_LIBRARY_PREFIX}mulle-atexit${CMAKE_STATIC_LIBRARY_SUFFIX} mulle-atexit NO_CMAKE_SYSTEM_PATH)
+   message( STATUS "MULLE_ATEXIT_LIBRARY is ${MULLE_ATEXIT_LIBRARY}")
+   #
+   # the order looks ascending, but due to the way this file is read
+   # it ends up being descending, which is what we need
+   if( MULLE_ATEXIT_LIBRARY)
+      #
+      # Add to MULLE_ATEXIT_LIBRARY list.
+      # Disable with: `mark no-cmakeadd`
+      #
+      set( DEPENDENCY_LIBRARIES
+         ${DEPENDENCY_LIBRARIES}
+         ${MULLE_ATEXIT_LIBRARY}
+         CACHE INTERNAL "need to cache this"
+      )
+      #
+      # Inherit ObjC loader and link dependency info.
+      # Disable with: `mark no-cmakeinherit`
+      #
+      # // temporarily expand CMAKE_MODULE_PATH
+      get_filename_component( _TMP_MULLE_ATEXIT_ROOT "${MULLE_ATEXIT_LIBRARY}" DIRECTORY)
+      get_filename_component( _TMP_MULLE_ATEXIT_ROOT "${_TMP_MULLE_ATEXIT_ROOT}" DIRECTORY)
+      #
+      #
+      # Search for "DependenciesAndLibraries.cmake" to include.
+      # Disable with: `mark no-cmakedependency`
+      #
+      foreach( _TMP_MULLE_ATEXIT_NAME "mulle-atexit")
+         set( _TMP_MULLE_ATEXIT_DIR "${_TMP_MULLE_ATEXIT_ROOT}/include/${_TMP_MULLE_ATEXIT_NAME}/cmake")
+         # use explicit path to avoid "surprises"
+         if( EXISTS "${_TMP_MULLE_ATEXIT_DIR}/DependenciesAndLibraries.cmake")
+            unset( MULLE_ATEXIT_DEFINITIONS)
+            list( INSERT CMAKE_MODULE_PATH 0 "${_TMP_MULLE_ATEXIT_DIR}")
+            # we only want top level INHERIT_OBJC_LOADERS, so disable them
+            if( NOT NO_INHERIT_OBJC_LOADERS)
+               set( NO_INHERIT_OBJC_LOADERS OFF)
+            endif()
+            list( APPEND _TMP_INHERIT_OBJC_LOADERS ${NO_INHERIT_OBJC_LOADERS})
+            set( NO_INHERIT_OBJC_LOADERS ON)
+            #
+            include( "${_TMP_MULLE_ATEXIT_DIR}/DependenciesAndLibraries.cmake")
+            #
+            list( GET _TMP_INHERIT_OBJC_LOADERS -1 NO_INHERIT_OBJC_LOADERS)
+            list( REMOVE_AT _TMP_INHERIT_OBJC_LOADERS -1)
+            #
+            list( REMOVE_ITEM CMAKE_MODULE_PATH "${_TMP_MULLE_ATEXIT_DIR}")
+            set( INHERITED_DEFINITIONS
+               ${INHERITED_DEFINITIONS}
+               ${MULLE_ATEXIT_DEFINITIONS}
+               CACHE INTERNAL "need to cache this"
+            )
+            break()
+         else()
+            message( STATUS "${_TMP_MULLE_ATEXIT_DIR}/DependenciesAndLibraries.cmake not found")
+         endif()
+      endforeach()
+   else()
+      message( FATAL_ERROR "MULLE_ATEXIT_LIBRARY was not found")
    endif()
 endif()
