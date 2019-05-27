@@ -1,3 +1,7 @@
+### 4.0.2
+
+* use --serial for more readable travis output
+
 ### 4.0.1
 
 * fix URL of mulle-atexit
