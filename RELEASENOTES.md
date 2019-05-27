@@ -1,3 +1,7 @@
+### 4.0.1
+
+* fix URL of mulle-atexit
+
 # 4.0.0
 
 * added `MULLE_TESTALLOCATOR_LEAKS` environment variable
