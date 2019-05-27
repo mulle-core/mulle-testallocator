@@ -19,5 +19,5 @@ before_install:
    - sudo apt-get -y install mulle-sde mulle-test
 
 script: |
-   mulle-sde -v craft
-   [ -d test ] && mulle-sde -v test
+   mulle-sde -v craft 
+   [ -d test ] && mulle-sde -v test --serial

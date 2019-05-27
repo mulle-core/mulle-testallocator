@@ -8,12 +8,16 @@
 #ifndef _mulle_testallocator_include_h__
 #define _mulle_testallocator_include_h__
 
+// library: remove with `mark no-header`, rename with `set include`
 # include <mulle-thread/mulle-thread.h>   // mulle-thread
 
+// library: remove with `mark no-header`, rename with `set include`
 # include <mulle-allocator/mulle-allocator.h>   // mulle-allocator
 
+// library: remove with `mark no-header`, rename with `set include`
 # include <mulle-stacktrace/mulle-stacktrace.h>   // mulle-stacktrace
 
+// library: remove with `mark no-header`, rename with `set include`
 # include <mulle-atexit/mulle-atexit.h>   // mulle-atexit
 
 #endif
