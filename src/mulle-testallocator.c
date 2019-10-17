@@ -42,6 +42,7 @@
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
 
 
 #pragma clang diagnostic ignored "-Wparentheses"
@@ -70,14 +71,14 @@ enum
 };
 
 
-static struct 
+static struct
 {
    int                       trace;
    mulle_thread_mutex_t      alloc_lock;
    struct _pointerset        allocations;
    struct _pointerset        frees;
    struct mulle_stacktrace   stacktrace;
-} local = 
+} local =
 {
    mulle_testallocator_trace_disabled
 };
@@ -105,7 +106,22 @@ static int   may_alloc( size_t size)
 }
 
 
-static void   bail( void *p)
+MULLE_C_NEVER_INLINE
+static void   log_stacktrace( char *format, ...)
+{
+   va_list   args;
+
+   va_start( args, format);
+   vfprintf( stderr, format, args);
+   if( local.trace & mulle_testallocator_trace_stacktrace)
+      mulle_stacktrace( &local.stacktrace, stderr);
+   fputc( '\n', stderr);
+   va_end( args);
+}
+
+
+MULLE_C_NEVER_INLINE
+void   mulle_testallocator_bail( void *p)
 {
 #if defined( __APPLE__)
    if( getenv( "MULLE_TESTALLOCATOR_HISTORY"))
@@ -140,12 +156,8 @@ static void   reused_pointer_assert( void *p)
 {
    if( _pointerset_get( &local.allocations, p))
    {
-      fprintf( stderr, "\n###\n### non-allocator freed block got reused: %p", p);
-      if( local.trace & mulle_testallocator_trace_stacktrace)
-         mulle_stacktrace( &local.stacktrace, stderr);
-      fputc( '\n', stderr);
-
-      bail( p);
+      log_stacktrace( "\n###\n### non-allocator freed block got reused: %p", p);
+      mulle_testallocator_bail( p);
    }
 }
 
@@ -174,12 +186,8 @@ static void  *test_realloc( void *q, size_t size)
          old = _pointerset_get( &local.allocations, q);
          if( ! old)
          {
-            fprintf( stderr, "\n###\n### false realloc: %p", q);
-            if( local.trace & mulle_testallocator_trace_stacktrace)
-               mulle_stacktrace( &local.stacktrace, stderr);
-            fputc( '\n', stderr);
-
-            bail( q);
+            log_stacktrace( "\n###\n### false realloc: %p", q);
+            mulle_testallocator_bail( q);
          }
          mulle_thread_mutex_unlock( &local.alloc_lock);
       }
@@ -229,12 +237,11 @@ static void  *test_realloc( void *q, size_t size)
    if( local.trace & mulle_testallocator_trace_verbose)
    {
       if( q)
-         fprintf( stderr, "realloced %p -> %p-%p", q, p, &((char *)p)[ size ? size - 1 : 0]);
+         log_stacktrace( "realloced %p -> %p-%p",
+                  q, p, &((char *)p)[ size ? size - 1 : 0]);
       else
-         fprintf( stderr, "alloced %p-%p", p, &((char *)p)[ size ? size - 1 : 0]);
-      if( local.trace & mulle_testallocator_trace_stacktrace)
-         mulle_stacktrace( &local.stacktrace, stderr);
-      fputc( '\n', stderr);
+         log_stacktrace( "alloced %p-%p",
+                  p, &((char *)p)[ size ? size - 1 : 0]);
    }
    return( p);
 }
@@ -271,10 +278,8 @@ static void  *test_calloc( size_t n, size_t size)
 
    if( local.trace & mulle_testallocator_trace_verbose)
    {
-      fprintf( stderr, "alloced %p-%p", p, &((char *)p)[ n * size ? n * size - 1 : 0]);
-      if( local.trace & mulle_testallocator_trace_stacktrace)
-         mulle_stacktrace( &local.stacktrace, stderr);
-      fputc( '\n', stderr);
+      log_stacktrace( "alloced %p-%p",
+               p, &((char *)p)[ n * size ? n * size - 1 : 0]);
    }
 
    return( p);
@@ -301,24 +306,16 @@ static void  test_free( void *p)
       q = _pointerset_get( &local.frees, p);
       if( q)
       {
-         fprintf( stderr, "\n###\n### double free: %p", p);
-         if( local.trace & mulle_testallocator_trace_stacktrace)
-            mulle_stacktrace( &local.stacktrace, stderr);
-         fputc( '\n', stderr);
-
-         bail( p);
+         log_stacktrace( "\n###\n### double free: %p", p);
+         mulle_testallocator_bail( p);
       }
       _pointerset_add( &local.frees, p, calloc, free);
 
       q = _pointerset_get( &local.allocations, p);
       if( ! q)
       {
-         fprintf( stderr, "\n###\n### false free: %p", p);
-         if( local.trace & mulle_testallocator_trace_stacktrace)
-            mulle_stacktrace( &local.stacktrace, stderr);
-         fputc( '\n', stderr);
-
-         bail( p);
+         log_stacktrace( "\n###\n### false free: %p", p);
+         mulle_testallocator_bail( p);
       }
       _pointerset_remove( &local.allocations, q);
 
@@ -330,10 +327,7 @@ static void  test_free( void *p)
 
    if( local.trace & mulle_testallocator_trace_verbose)
    {
-      fprintf( stderr, "freed %p", p);  // analyzer: just an address print
-      if( local.trace & mulle_testallocator_trace_stacktrace)
-         mulle_stacktrace( &local.stacktrace, stderr);
-      fputc( '\n', stderr);
+      log_stacktrace( "freed %p", p);  // analyzer: just an address print
    }
 }
 
@@ -436,7 +430,7 @@ void   _mulle_testallocator_detect_leaks()
    _pointerset_enumerator_done( &rover);
 
    if( first_leak && ! (leakmode & mulle_testallocator_leak_dont_bail))
-      bail( first_leak);
+      mulle_testallocator_bail( first_leak);
 }
 
 
@@ -453,6 +447,7 @@ static void   trace_log_pointer( char *s, void *pointer)
      fprintf( stderr, "mulle_testallocator: %s (%p)\n", s, pointer);
 }
 
+
 //
 // TODO: MULLE_C_CONSTRUCTOR doesn't work with non-clang compilers
 //
@@ -468,9 +463,7 @@ static void   mulle_testallocator_exit()
 }
 
 
-
-MULLE_C_CONSTRUCTOR( mulle_testallocator_initialize)
-void   mulle_testallocator_initialize( void)
+static void   _mulle_testallocator_initialize( void *unused)
 {
    int    rval;
    char   *s;
@@ -487,6 +480,25 @@ void   mulle_testallocator_initialize( void)
 
    if( getenv_yes_no( "MULLE_TESTALLOCATOR"))
    {
+      /* Now it gets tricky. In a dylib situation we are not linked with
+         mulle_atexit. mulle_atexit will be statically linked to the exe,
+         and this will be resolved at link time. So thats fine. If
+         mulle_testallocator is added with DYLD_INSERT_LIBRARY this will also
+         work (AFAIK). But if you want to run the debugger within such
+         a DYLD_INSERT_LIBRARY environment, this will fail, since the debugger
+         itself is also getting the insertion and it is usually NOT linked
+         with mulle_atexit. For this we lazy link mulle_atexit and just don't
+         do the codepath if mulle_atexit is not available.
+      */
+      void  (*p_mulle_atexit)( void (*)( void (*)(void)));
+
+      p_mulle_atexit = dlsym( MULLE_RTLD_DEFAULT, "mulle_atexit");
+      if( ! p_mulle_atexit)
+      {
+         trace_log( "not enabled as mulle_atexit was not found");
+         return;
+      }
+
       trace_log_pointer( "start:     mulle_testallocator_initialize", &mulle_testallocator_initialize);
       trace_log_pointer( "allocator: mulle_default_allocator", &mulle_default_allocator);
       trace_log_pointer( "stdlib:    mulle_stdlib_allocator", &mulle_stdlib_allocator);
@@ -499,11 +511,29 @@ void   mulle_testallocator_initialize( void)
       _mulle_stacktrace_init( &local.stacktrace, 0, 0, 0, 0);
 
       trace_log_pointer( "install atexit \"mulle_testallocator_exit\"", (void *) mulle_testallocator_exit);
-      mulle_atexit( mulle_testallocator_exit);
+
+      (*p_mulle_atexit)( mulle_testallocator_exit);
    }
 
-   if( mulle_testallocator_config.dont_free && local.trace)
-      fprintf( stderr, "mulle_testallocator: memory will not really be freed\n");
+   if( mulle_testallocator_config.dont_free)
+      trace_log( "memory will not really be freed");
+}
+
+
+MULLE_C_CONSTRUCTOR( mulle_testallocator_initialize)
+void   mulle_testallocator_initialize( void)
+{
+//#ifdef __APPLE__
+//   // on APPLE we don't need mulle_atinit, it doesn't work right to delay
+//   // this why ??
+//   _mulle_testallocator_initialize( NULL);
+//#else
+# ifdef DEBUG
+   fprintf( stderr, "mulle_testallocator_initialize: mulle_atinit set for _mulle_testallocator_initialize\n");
+# endif
+   // 1 meeelion priority!
+   mulle_atinit( _mulle_testallocator_initialize, NULL, 1000000);
+//#endif
 }
 
 
