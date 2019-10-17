@@ -1,3 +1,8 @@
+## 4.1.0
+
+* use mulle-atinit if needed
+
+
 ### 4.0.2
 
 * use --serial for more readable travis output
