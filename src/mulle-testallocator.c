@@ -472,7 +472,11 @@ static void   _mulle_testallocator_initialize( void *unused)
       return;
 
    rval = mulle_thread_mutex_init( &local.alloc_lock);
-   assert( ! rval);
+   if( rval)
+   {
+      fprintf( stderr, "_mulle_testallocator_initialize could not get a mutex\n");
+      abort();
+   }
 
    s = getenv( "MULLE_TESTALLOCATOR_TRACE");
    mulle_testallocator_set_tracelevel( s ? atoi( s) : 0);
