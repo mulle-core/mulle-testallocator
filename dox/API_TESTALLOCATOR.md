@@ -36,6 +36,8 @@ Variable                         | Description
 `MULLE_TESTALLOCATOR_TRACE`      | Trace setup, allocations and deallocations. 1: trace setup and exit. 2: additionally traces allocations. 3: adds a stacktrace to the output (on participating platforms). A value larger than 3 increases the verbosity of the stacktrace.
 `MULLE_TESTALLOCATOR_DONT_FREE`  | Memory is not actually freed, this can be useful, when reuse of memory makes the trace too confusing. Obviously this can burn memory away quickly.
 `MULLE_TESTALLOCATOR_FIRST_LEAK` | Only report the first leak if set to 1 or YES.
+`MULLE_TESTALLOCATOR_MAX_SIZE`   | Creates an out of memory condition if more than max size is allocated (in one call)
+
 
 
 ## Automatic startup is tricky and platform dependent
