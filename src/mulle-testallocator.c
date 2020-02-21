@@ -78,6 +78,7 @@ static struct
    struct _pointerset        allocations;
    struct _pointerset        frees;
    struct mulle_stacktrace   stacktrace;
+   size_t                    max_size;
 } local =
 {
    mulle_testallocator_trace_disabled
@@ -102,7 +103,7 @@ static int   may_alloc( size_t size)
    if( mulle_testallocator_config.out_of_memory)
       return( 0);
 
-   return( ! mulle_testallocator_config.max_size ||  size > mulle_testallocator_config.max_size);
+   return( ! mulle_testallocator_config.max_size || size <= mulle_testallocator_config.max_size);
 }
 
 
@@ -290,7 +291,8 @@ static void  test_free( void *p)
 {
    void   *q;
 
-   assert( local.trace != mulle_testallocator_trace_disabled && "mulle_testallocator_initialize has not run yet");
+   assert( local.trace != mulle_testallocator_trace_disabled &&
+           "mulle_testallocator_initialize has not run yet");
 
    if( ! p)
       return;
@@ -371,12 +373,33 @@ static int   getenv_yes_no( char *name)
 }
 
 
+static long   getenv_long( char *name)
+{
+   char   *s;
+
+   s = getenv( name);
+   if( ! s)
+      return( 0);
+
+   return( atol( s));
+}
+
+
 void   mulle_testallocator_set_tracelevel( unsigned int value)
 {
    if( (int) value != local.trace && (local.trace != mulle_testallocator_trace_disabled || (int) value > 0))
-      fprintf( stderr, "mulle_testallocator: local.trace level set to %d\n", value);
+      fprintf( stderr, "mulle_testallocator: trace level set to %d\n", value);
 
    local.trace = value;
+}
+
+
+void   mulle_testallocator_set_max_size( size_t value)
+{
+   if( (int) value != local.trace && (local.trace != mulle_testallocator_trace_disabled || (int) value > 0))
+      fprintf( stderr, "mulle_testallocator: max size set to %ld\n", (long) value);
+
+   mulle_testallocator_config.max_size = value;
 }
 
 
@@ -393,7 +416,6 @@ void   _mulle_testallocator_reset()
    _pointerset_done( &local.frees, free);
 
    mulle_testallocator_config.out_of_memory = 0;
-   mulle_testallocator_config.max_size      = 0;
 
    _pointerset_init( &local.allocations);
    _pointerset_init( &local.frees);
@@ -478,8 +500,8 @@ static void   _mulle_testallocator_initialize( void *unused)
       abort();
    }
 
-   s = getenv( "MULLE_TESTALLOCATOR_TRACE");
-   mulle_testallocator_set_tracelevel( s ? atoi( s) : 0);
+   mulle_testallocator_set_tracelevel( (int) getenv_long( "MULLE_TESTALLOCATOR_TRACE"));
+   mulle_testallocator_set_max_size( getenv_long( "MULLE_TESTALLOCATOR_MAX_SIZE"));
    mulle_testallocator_config.dont_free = getenv_yes_no( "MULLE_TESTALLOCATOR_DONT_FREE");
 
    if( getenv_yes_no( "MULLE_TESTALLOCATOR"))

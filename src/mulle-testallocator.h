@@ -49,6 +49,7 @@ MULLE_ALLOCATOR_EXTERN_GLOBAL struct mulle_allocator               mulle_testall
 void   mulle_testallocator_initialize( void);
 void   mulle_testallocator_reset_detect_leaks( int detect);
 void   mulle_testallocator_set_tracelevel( unsigned int value); // 0,1,2 -1 turns off
+void   mulle_testallocator_set_max_size( size_t value); // 0 turns off
 
 //
 // the symbolizer parses the backtrace string and possibly improves it
