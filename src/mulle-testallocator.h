@@ -41,7 +41,7 @@
 
 #include "mulle-testallocator-struct.h"
 
-#define MULLE_TESTALLOCATOR_VERSION    ((4 << 20) | (1 << 8) | 0)
+#define MULLE_TESTALLOCATOR_VERSION    ((4 << 20) | (2 << 8) | 0)
 
 MULLE_ALLOCATOR_EXTERN_GLOBAL struct _mulle_testallocator_config   mulle_testallocator_config;
 MULLE_ALLOCATOR_EXTERN_GLOBAL struct mulle_allocator               mulle_testallocator;
