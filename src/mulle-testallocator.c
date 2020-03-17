@@ -115,7 +115,7 @@ static void   log_stacktrace( char *format, ...)
    va_start( args, format);
    vfprintf( stderr, format, args);
    if( local.trace & mulle_testallocator_trace_stacktrace)
-      mulle_stacktrace( &local.stacktrace, stderr);
+      _mulle_stacktrace( &local.stacktrace, 1, mulle_stacktrace_trimmed, stderr);
    fputc( '\n', stderr);
    va_end( args);
 }
@@ -534,7 +534,7 @@ static void   _mulle_testallocator_initialize( void *unused)
       mulle_default_allocator.realloc = test_realloc;
       mulle_default_allocator.free    = test_free;
 
-      _mulle_stacktrace_init( &local.stacktrace, 0, 0, 0, 0);
+      _mulle_stacktrace_init_default( &local.stacktrace);
 
       trace_log_pointer( "install atexit \"mulle_testallocator_exit\"", (void *) mulle_testallocator_exit);
 

@@ -1,3 +1,8 @@
+## 4.2.0
+
+* Various small improvements
+
+
 ## 4.1.0
 
 * use mulle-atinit if needed
