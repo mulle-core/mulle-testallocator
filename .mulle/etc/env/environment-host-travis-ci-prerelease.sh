@@ -1,3 +1,4 @@
+# Fill it with mulle-env envirionment --scope  set <key> <value>
 #
 # mulle-thread nodetype: ${MULLE_THREAD_NODETYPE:-tar}
 #
@@ -14,6 +15,24 @@ export MULLE_THREAD_URL="https://github.com/mulle-concurrent/mulle-thread.git"
 # mulle-thread branch: ${MULLE_THREAD_BRANCH}
 #
 export MULLE_THREAD_BRANCH="prerelease"
+
+
+#
+# mulle-c11 nodetype: ${MULLE_C11_NODETYPE:-tar}
+#
+export MULLE_C11_NODETYPE="git"
+
+
+#
+# mulle-c11 url: ${MULLE_C11_URL:-https://github.com/mulle-c/mulle-c11/archive/${MULLE_TAG}.tar.gz}
+#
+export MULLE_C11_URL="https://github.com/mulle-c/mulle-c11.git"
+
+
+#
+# mulle-c11 branch: ${MULLE_C11_BRANCH}
+#
+export MULLE_C11_BRANCH="prerelease"
 
 
 #
@@ -50,6 +69,24 @@ export MULLE_STACKTRACE_URL="https://github.com/mulle-core/mulle-stacktrace.git"
 # mulle-stacktrace branch: ${MULLE_STACKTRACE_BRANCH}
 #
 export MULLE_STACKTRACE_BRANCH="prerelease"
+
+
+#
+# mulle-dlfcn nodetype: ${MULLE_DLFCN_NODETYPE:-tar}
+#
+export MULLE_DLFCN_NODETYPE="git"
+
+
+#
+# mulle-dlfcn url: ${MULLE_DLFCN_URL:-https://github.com/mulle-core/mulle-dlfcn/archive/${MULLE_TAG}.tar.gz}
+#
+export MULLE_DLFCN_URL="https://github.com/mulle-core/mulle-dlfcn.git"
+
+
+#
+# mulle-dlfcn branch: ${MULLE_DLFCN_BRANCH}
+#
+export MULLE_DLFCN_BRANCH="prerelease"
 
 
 #
