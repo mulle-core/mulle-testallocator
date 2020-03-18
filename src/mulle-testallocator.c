@@ -113,10 +113,12 @@ static void   log_stacktrace( char *format, ...)
    va_list   args;
 
    va_start( args, format);
-   vfprintf( stderr, format, args);
-   if( local.trace & mulle_testallocator_trace_stacktrace)
-      _mulle_stacktrace( &local.stacktrace, 1, mulle_stacktrace_trimmed, stderr);
-   fputc( '\n', stderr);
+   {
+      vfprintf( stderr, format, args);
+      if( local.trace & mulle_testallocator_trace_stacktrace)
+         _mulle_stacktrace( &local.stacktrace, 1, mulle_stacktrace_trimmed, stderr);
+      fputc( '\n', stderr);
+   }
    va_end( args);
 }
 
@@ -223,7 +225,7 @@ static void  *test_realloc( void *q, size_t size)
             {
                assert( ! _pointerset_get( &local.frees, q));
                assert( _pointerset_get( &local.allocations, q));
-               _pointerset_remove( &local.allocations, q); // just a pointere remove
+               _pointerset_remove( &local.allocations, q); // just a pointer remove
                _pointerset_add( &local.frees, q, calloc, free);
 
                _pointerset_remove( &local.frees, p);
