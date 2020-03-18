@@ -14,6 +14,7 @@ src/include-private.h
 )
 
 set( PUBLIC_HEADERS
+src/blockset.h
 src/include.h
 src/mulle-testallocator.h
 src/mulle-testallocator-struct.h

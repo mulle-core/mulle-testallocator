@@ -27,7 +27,7 @@ if( STANDALONE)
    endif()
 
    if( NOT STANDALONE_DEFINITIONS)
-      set( STANDALONE_DEFINITIONS ${MULLE_TESTALLOCATOR_DEFINITIONS})
+      set( STANDALONE_DEFINITIONS ${mulle_testallocator_DEFINITIONS})
    endif()
 
    #

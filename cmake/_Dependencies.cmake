@@ -19,7 +19,7 @@ if( NOT MULLE_THREAD_LIBRARY)
    #
    if( MULLE_THREAD_LIBRARY)
       #
-      # Add to MULLE_THREAD_LIBRARY list.
+      # Add to MULLE_THREAD_LIBRARY to DEPENDENCY_LIBRARIES list.
       # Disable with: `mulle-sourcetree mark mulle-thread no-cmakeadd`
       #
       set( DEPENDENCY_LIBRARIES
@@ -87,7 +87,7 @@ if( NOT MULLE_ALLOCATOR_LIBRARY)
    #
    if( MULLE_ALLOCATOR_LIBRARY)
       #
-      # Add to MULLE_ALLOCATOR_LIBRARY list.
+      # Add to MULLE_ALLOCATOR_LIBRARY to DEPENDENCY_LIBRARIES list.
       # Disable with: `mulle-sourcetree mark mulle-allocator no-cmakeadd`
       #
       set( DEPENDENCY_LIBRARIES
@@ -155,7 +155,7 @@ if( NOT MULLE_STACKTRACE_LIBRARY)
    #
    if( MULLE_STACKTRACE_LIBRARY)
       #
-      # Add to MULLE_STACKTRACE_LIBRARY list.
+      # Add to MULLE_STACKTRACE_LIBRARY to DEPENDENCY_LIBRARIES list.
       # Disable with: `mulle-sourcetree mark mulle-stacktrace no-cmakeadd`
       #
       set( DEPENDENCY_LIBRARIES
@@ -223,7 +223,7 @@ if( NOT MULLE_ATINIT_LIBRARY)
    #
    if( MULLE_ATINIT_LIBRARY)
       #
-      # Add to MULLE_ATINIT_LIBRARY list.
+      # Add to MULLE_ATINIT_LIBRARY to STARTUP_ALL_LOAD_DEPENDENCY_LIBRARIES list.
       # Disable with: `mulle-sourcetree mark mulle-atinit no-cmakeadd`
       #
       set( STARTUP_ALL_LOAD_DEPENDENCY_LIBRARIES
@@ -308,7 +308,7 @@ if( NOT MULLE_ATEXIT_LIBRARY)
    #
    if( MULLE_ATEXIT_LIBRARY)
       #
-      # Add to MULLE_ATEXIT_LIBRARY list.
+      # Add to MULLE_ATEXIT_LIBRARY to STARTUP_ALL_LOAD_DEPENDENCY_LIBRARIES list.
       # Disable with: `mulle-sourcetree mark mulle-atexit no-cmakeadd`
       #
       set( STARTUP_ALL_LOAD_DEPENDENCY_LIBRARIES
