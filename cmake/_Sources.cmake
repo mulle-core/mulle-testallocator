@@ -7,5 +7,8 @@ endif()
 
 set( SOURCES
 src/mulle-testallocator.c
+)
+
+set( STANDALONE_SOURCES
 src/mulle-testallocator-standalone.c
 )
