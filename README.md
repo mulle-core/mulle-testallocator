@@ -10,7 +10,7 @@ Build Status | Release Version
 -------------|-----------------------------------
 [![Build Status](https://travis-ci.org/mulle-core/mulle-testallocator.svg?branch=release)](https://travis-ci.org/mulle-core/mulle-testallocator) | ![Mulle kybernetiK tag](https://img.shields.io/github/tag/mulle-core/mulle-testallocator.svg) [![Build Status](https://travis-ci.org/mulle-core/mulle-testallocator.svg?branch=release)](https://travis-ci.org/mulle-core/mulle-testallocator)
 
-##  Use `mulle_testallocator` for leak detection
+###  Use `mulle_testallocator` for leak detection
 
 Use `mulle_malloc` and friends instead of `malloc` in your code.
 
