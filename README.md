@@ -70,16 +70,42 @@ All `mulle_testallocator` routines will check for erroneus frees and
 wrong pointers.
 
 
+## API
+
+* [Test Allocator](dox/API_TESTALLOCATOR.md)
+
+
+### Platforms and Compilers
+
+All platforms and compilers supported by
+[mulle-c11](//github.com/mulle-c/mulle-c11) and
+[mulle-thread](//github.com/mulle-concurrent/mulle-thread).
+
+
+
+## Add 
+
+Use [mulle-sde](//github.com/mulle-sde) to add mulle-stacktrace to your project:
+
+```
+mulle-sde dependency add --c --github mulle-core mulle-stacktrace
+```
+
 ## Install
 
-Use [mulle-sde](//github.com/mulle-sde) to add mulle-testallocator to your
-dependencies `mulle-sde dependency add https://github.com/mulle-core/mulle-testallocator.git`.
+### mulle-sde
 
+Use [mulle-sde](//github.com/mulle-sde) to build and install mulle-stacktrace and all dependencies:
 
-## Manual Installation
+```
+mulle-sde install --prefix /usr/local \
+   https://github.com/mulle-core/mulle-stacktrace/archive/latest.tar.gz
+```
+
+### Manual Installation
+
 
 Install the requirements:
-
 
 Requirements                                                 | Description
 -------------------------------------------------------------|-----------------------
@@ -89,7 +115,6 @@ Requirements                                                 | Description
 [mulle-stacktrace](//github.com/mulle-core/mulle-stracktrace)| Stacktrace support glue
 [mulle-atinit](//github.com/mulle-core/mulle-atinit)         | Cross-platform atinit support
 [mulle-atexit](//github.com/mulle-core/mulle-atexit)         | Cross-platform atexit support
-
 
 Install into `/usr/local`:
 
@@ -103,19 +128,6 @@ mkdir build 2> /dev/null
    make install
 )
 ```
-
-
-
-## API
-
-* [Test Allocator](dox/API_TESTALLOCATOR.md)
-
-
-### Platforms and Compilers
-
-All platforms and compilers supported by
-[mulle-c11](//github.com/mulle-c/mulle-c11) and
-[mulle-thread](//github.com/mulle-concurrent/mulle-thread).
 
 
 ## Author
