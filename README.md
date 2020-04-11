@@ -85,21 +85,21 @@ All platforms and compilers supported by
 
 ## Add 
 
-Use [mulle-sde](//github.com/mulle-sde) to add mulle-stacktrace to your project:
+Use [mulle-sde](//github.com/mulle-sde) to add mulle-testallocator to your project:
 
 ```
-mulle-sde dependency add --c --github mulle-core mulle-stacktrace
+mulle-sde dependency add --c --github mulle-core mulle-testallocator
 ```
 
 ## Install
 
 ### mulle-sde
 
-Use [mulle-sde](//github.com/mulle-sde) to build and install mulle-stacktrace and all dependencies:
+Use [mulle-sde](//github.com/mulle-sde) to build and install mulle-testallocator and all dependencies:
 
 ```
 mulle-sde install --prefix /usr/local \
-   https://github.com/mulle-core/mulle-stacktrace/archive/latest.tar.gz
+   https://github.com/mulle-core/mulle-testallocator/archive/latest.tar.gz
 ```
 
 ### Manual Installation
