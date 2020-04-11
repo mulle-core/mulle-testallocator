@@ -87,17 +87,23 @@ Requirements                                                 | Description
 [mulle-allocator](//github.com/mulle-c/mulle-allocator)      | Memory allocation library
 [mulle-thread](//github.com/mulle-concurrent/mulle-thread)   | Thread and lock glue
 [mulle-stacktrace](//github.com/mulle-core/mulle-stracktrace)| Stacktrace support glue
+[mulle-atinit](//github.com/mulle-core/mulle-atinit)         | Cross-platform atinit support
+[mulle-atexit](//github.com/mulle-core/mulle-atexit)         | Cross-platform atexit support
 
 
-Install with
+Install into `/usr/local`:
 
 ```
-mkdir build
-cd build
-cmake
-make
-make install
+mkdir build 2> /dev/null
+(
+   cd build ;
+   cmake -DCMAKE_INSTALL_PREFIX=/usr/local \
+         -DCMAKE_PREFIX_PATH=/usr/local \
+         -DCMAKE_BUILD_TYPE=Release .. ;
+   make install
+)
 ```
+
 
 
 ## API
