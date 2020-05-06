@@ -66,7 +66,7 @@ mulle_testallocator_reset();
 
 and `mulle_testallocator_reset` will tell you about your leaks.
 
-All `mulle_testallocator` routines will check for erroneus frees and
+All `mulle_testallocator` routines will check for erroneous frees and
 wrong pointers.
 
 
