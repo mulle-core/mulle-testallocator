@@ -66,13 +66,30 @@ mulle_testallocator_reset();
 
 and `mulle_testallocator_reset` will tell you about your leaks.
 
-All `mulle_testallocator` routines will check for erroneus frees and
+All `mulle_testallocator` routines will check for erroneous frees and
 wrong pointers.
 
+> #### Tip
+>
+> Locate Objective-C leaks easily with
+>
+> ```
+> MULLE_OBJC_EPHEMERAL_SINGLETON=YES \
+> MULLE_OBJC_TRACE_INSTANCE=YES \
+> MULLE_OBJC_TRACE_METHOD_CALL=YES \
+> MULLE_TESTALLOCATOR_TRACE=2 \
+>    ./kitchen/Debug/myexe
+> ```
+> The search for the leak address and you will see the method that
+> allocated the leak.
+>
 
-## API
 
-* [Test Allocator](dox/API_TESTALLOCATOR.md)
+## API and Environment
+
+You can configure trace output and other properties of the
+[Test Allocator](dox/API_TESTALLOCATOR.md) via the API or environment
+variables.
 
 
 ### Platforms and Compilers
@@ -83,7 +100,7 @@ All platforms and compilers supported by
 
 
 
-## Add 
+## Add
 
 Use [mulle-sde](//github.com/mulle-sde) to add mulle-testallocator to your project:
 

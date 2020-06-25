@@ -36,8 +36,7 @@
 #ifndef pointerset_h__
 #define pointerset_h__
 
-#pragma mark -
-#pragma mark _pointerset, simple growing hashtable all inlined used for testing
+#pragma mark - _pointerset, simple growing hashtable all inlined used for testing
 
 #include <assert.h>
 #include <string.h>
@@ -80,8 +79,7 @@ static inline void  _pointerset_free( struct _pointerset *set, void (*free)( voi
    (*free)( set);
 }
 
-#pragma mark -
-#pragma mark hash
+#pragma mark - hash
 
 
 // from code.google.com/p/smhasher/wiki/MurmurHash3
@@ -122,8 +120,7 @@ static inline uintptr_t  _pointerset_hash( struct _pointerset *set, void *p)
 }
 
 
-#pragma mark -
-#pragma mark enumerator
+#pragma mark - enumerator
 
 struct _pointerset_enumerator
 {
@@ -172,8 +169,7 @@ static inline void  _pointerset_enumerator_done( struct _pointerset_enumerator *
 }
 
 
-#pragma mark -
-#pragma mark put
+#pragma mark - put
 
 static inline void   *_pointerset_sureadd( struct _pointerset *set,
                                            void  *pointer)
@@ -289,8 +285,7 @@ static inline void   *_pointerset_add( struct _pointerset *set,
 }
 
 
-#pragma mark -
-#pragma mark get
+#pragma mark - get
 
 static inline void  *_pointerset_get( struct _pointerset *set, void *pointer)
 {

@@ -36,8 +36,7 @@
 #ifndef pointerarray_h__
 #define pointerarray_h__
 
-#pragma mark -
-#pragma mark _pointerarray, simple growing array all inlined used for testing
+#pragma mark - _pointerarray, simple growing array all inlined used for testing
 
 #include <assert.h>
 #include <string.h>
