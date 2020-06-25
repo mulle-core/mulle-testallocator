@@ -47,8 +47,7 @@
 
 #pragma clang diagnostic ignored "-Wparentheses"
 
-#pragma mark -
-#pragma mark track allocations
+#pragma mark - track allocations
 
 #include "pointerset.h"
 
@@ -336,8 +335,7 @@ static void  test_free( void *p)
 }
 
 
-#pragma mark -
-#pragma mark global variable
+#pragma mark - global variable
 
 MULLE_C_GLOBAL
 struct mulle_allocator   mulle_testallocator =
@@ -350,8 +348,7 @@ struct mulle_allocator   mulle_testallocator =
 };
 
 
-#pragma mark -
-#pragma mark reset allocator between tests
+#pragma mark - reset allocator between tests
 
 static int   getenv_yes_no( char *name)
 {
