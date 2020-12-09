@@ -8,7 +8,7 @@ endif()
 
 #
 # Generated from sourcetree: mulle-thread;no-all-load,no-import,no-singlephase;
-# Disable with: `mulle-sourcetree mark mulle-thread no-link`
+# Disable with: `mulle-sourcetree mark mulle-thread no-header`
 #
 if( NOT MULLE_THREAD_LIBRARY)
    find_library( MULLE_THREAD_LIBRARY NAMES ${CMAKE_STATIC_LIBRARY_PREFIX}mulle-thread${CMAKE_STATIC_LIBRARY_SUFFIX} mulle-thread NO_CMAKE_SYSTEM_PATH NO_SYSTEM_ENVIRONMENT_PATH)
@@ -76,7 +76,7 @@ endif()
 
 #
 # Generated from sourcetree: mulle-allocator;no-all-load,no-import,no-singlephase;
-# Disable with: `mulle-sourcetree mark mulle-allocator no-link`
+# Disable with: `mulle-sourcetree mark mulle-allocator no-header`
 #
 if( NOT MULLE_ALLOCATOR_LIBRARY)
    find_library( MULLE_ALLOCATOR_LIBRARY NAMES ${CMAKE_STATIC_LIBRARY_PREFIX}mulle-allocator${CMAKE_STATIC_LIBRARY_SUFFIX} mulle-allocator NO_CMAKE_SYSTEM_PATH NO_SYSTEM_ENVIRONMENT_PATH)
@@ -144,7 +144,7 @@ endif()
 
 #
 # Generated from sourcetree: mulle-stacktrace;no-all-load,no-import,no-public,no-singlephase;
-# Disable with: `mulle-sourcetree mark mulle-stacktrace no-link`
+# Disable with: `mulle-sourcetree mark mulle-stacktrace no-header`
 #
 if( NOT MULLE_STACKTRACE_LIBRARY)
    find_library( MULLE_STACKTRACE_LIBRARY NAMES ${CMAKE_STATIC_LIBRARY_PREFIX}mulle-stacktrace${CMAKE_STATIC_LIBRARY_SUFFIX} mulle-stacktrace NO_CMAKE_SYSTEM_PATH NO_SYSTEM_ENVIRONMENT_PATH)
@@ -212,7 +212,7 @@ endif()
 
 #
 # Generated from sourcetree: mulle-atinit;no-dynamic-link,no-import,no-intermediate-link,no-public,no-singlephase;
-# Disable with: `mulle-sourcetree mark mulle-atinit no-link`
+# Disable with: `mulle-sourcetree mark mulle-atinit no-header`
 #
 if( NOT MULLE_ATINIT_LIBRARY)
    find_library( MULLE_ATINIT_LIBRARY NAMES ${CMAKE_STATIC_LIBRARY_PREFIX}mulle-atinit${CMAKE_STATIC_LIBRARY_SUFFIX} mulle-atinit NO_CMAKE_SYSTEM_PATH NO_SYSTEM_ENVIRONMENT_PATH)
@@ -297,7 +297,7 @@ endif()
 
 #
 # Generated from sourcetree: mulle-atexit;no-dynamic-link,no-import,no-intermediate-link,no-public,no-singlephase;
-# Disable with: `mulle-sourcetree mark mulle-atexit no-link`
+# Disable with: `mulle-sourcetree mark mulle-atexit no-header`
 #
 if( NOT MULLE_ATEXIT_LIBRARY)
    find_library( MULLE_ATEXIT_LIBRARY NAMES ${CMAKE_STATIC_LIBRARY_PREFIX}mulle-atexit${CMAKE_STATIC_LIBRARY_SUFFIX} mulle-atexit NO_CMAKE_SYSTEM_PATH NO_SYSTEM_ENVIRONMENT_PATH)
