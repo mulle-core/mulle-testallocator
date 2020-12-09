@@ -1,5 +1,6 @@
 #include <mulle-allocator/mulle-allocator.h>
 #include <mulle-testallocator/mulle-testallocator.h>
+#include <stdlib.h>
 
 
 static void  run_test( void)
