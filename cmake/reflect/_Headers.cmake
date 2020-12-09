@@ -28,6 +28,5 @@ src/mulle-testallocator.h
 src/mulle-testallocator-struct.h
 src/pointerarray.h
 src/pointerset.h
-src/version.h
 )
 
