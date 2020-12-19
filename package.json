@@ -1,0 +1,20 @@
+{
+   "name" : "mulle-testallocator",
+   "version" : "4.2.2",
+   "description" : "🔄 C memory leak and double free checking",
+   "homepage" : "https://github.com/mulle-core/mulle-testallocator",
+   "bugs" : "https://github.com/mulle-core/mulle-testallocator/issues",
+   "keywords" : [],
+   "license" : "BSD-3-Clause",
+   "repository" : {
+      "type" : "git",
+      "url" : "mulle-core/mulle-testallocator"
+   },
+   "dependencies" : {
+      "mulle-thread" : "mulle-concurrent/mulle-thread",
+      "mulle-allocator" : "mulle-c/mulle-allocator",
+      "mulle-stacktrace" : "mulle-core/mulle-stacktrace",
+      "mulle-atinit" : "mulle-core/mulle-atinit",
+      "mulle-atexit" : "mulle-core/mulle-atexit"
+   }
+}
