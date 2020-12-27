@@ -10,6 +10,7 @@ mulle-testallocator is a leak and double free checker for tests
 |-----------------------------------
 [![Build Status](https://travis-ci.org/mulle-core/mulle-testallocator.svg?branch=release)](https://travis-ci.org/mulle-core/mulle-testallocator) | ![Mulle kybernetiK tag](https://img.shields.io/github/tag/mulle-core/mulle-testallocator.svg?branch=release) [![Build Status](https://travis-ci.org/mulle-core/mulle-testallocator.svg?branch=release)](https://travis-ci.org/mulle-core/mulle-testallocator)
 
+
 ###  Use `mulle_testallocator` for leak detection
 
 Use `mulle_malloc` and friends instead of `malloc` in your code.
@@ -105,7 +106,9 @@ All platforms and compilers supported by
 Use [mulle-sde](//github.com/mulle-sde) to add mulle-testallocator to your project:
 
 ```
-mulle-sde dependency add --c --github mulle-core mulle-testallocator
+mulle-sde dependency add --marks all-load,no-singlephase \
+                         --github mulle-core \
+                         mulle-testallocator
 ```
 
 ## Install
