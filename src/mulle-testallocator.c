@@ -73,10 +73,10 @@ enum
 static struct
 {
    int                       trace;
+   struct mulle_stacktrace   stacktrace;
    mulle_thread_mutex_t      alloc_lock;
    struct _pointerset        allocations;
    struct _pointerset        frees;
-   struct mulle_stacktrace   stacktrace;
    size_t                    max_size;
 } local =
 {
@@ -238,7 +238,7 @@ static void  *test_realloc( void *q, size_t size)
 
    if( local.trace & mulle_testallocator_trace_verbose)
    {
-      if( q)
+      if( q) // analyzer, just a print of the old address
          log_stacktrace( "realloced %p -> %p-%p",
                   q, p, &((char *)p)[ size ? size - 1 : 0]);
       else
@@ -503,6 +503,8 @@ static void   _mulle_testallocator_initialize( void *unused)
    mulle_testallocator_set_max_size( getenv_long( "MULLE_TESTALLOCATOR_MAX_SIZE"));
    mulle_testallocator_config.dont_free = getenv_yes_no( "MULLE_TESTALLOCATOR_DONT_FREE");
 
+   _mulle_stacktrace_init_default( &local.stacktrace);
+
    if( getenv_yes_no( "MULLE_TESTALLOCATOR"))
    {
       /* Now it gets tricky. In a dylib situation we are not linked with
@@ -533,15 +535,13 @@ static void   _mulle_testallocator_initialize( void *unused)
       mulle_default_allocator.realloc = test_realloc;
       mulle_default_allocator.free    = test_free;
 
-      _mulle_stacktrace_init_default( &local.stacktrace);
-
       trace_log_pointer( "install atexit \"mulle_testallocator_exit\"", (void *) mulle_testallocator_exit);
 
       (*p_mulle_atexit)( mulle_testallocator_exit);
-   }
 
-   if( mulle_testallocator_config.dont_free)
-      trace_log( "memory will not really be freed");
+      if( mulle_testallocator_config.dont_free)
+         trace_log( "memory will not really be freed");
+   }
 }
 
 
