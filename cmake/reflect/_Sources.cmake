@@ -8,10 +8,16 @@ if( MULLE_TRACE_INCLUDE)
    MESSAGE( STATUS "# Include \"${CMAKE_CURRENT_LIST_FILE}\"" )
 endif()
 
+#
+# contents selected with patternfile ??-source--sources
+#
 set( SOURCES
 src/mulle-testallocator.c
 )
 
+#
+# contents selected with patternfile ??-source--standalone-sources
+#
 set( STANDALONE_SOURCES
 src/mulle-testallocator-standalone.c
 )

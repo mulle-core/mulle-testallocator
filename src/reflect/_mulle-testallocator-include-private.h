@@ -5,7 +5,7 @@
  *
  *      mulle-sde environment set MULLE_SOURCETREE_TO_C_PRIVATEINCLUDE_FILE DISABLE
  *
- *   To not generate any header files:
+ *   To not let mulle-sourcetree-to-c generate any header files:
  *
  *      mulle-sde environment set MULLE_SOURCETREE_TO_C_RUN DISABLE
  *
@@ -22,7 +22,8 @@
 //    toggle #include:    `mulle-sourcetree mark mulle-stacktrace [no-]import`
 //    toggle public:      `mulle-sourcetree mark mulle-stacktrace [no-]public`
 //    toggle optional:    `mulle-sourcetree mark mulle-stacktrace [no-]require`
-//    remove for platform:`mulle-sourcetree mark mulle-stacktrace no-platform-<name>`
+//    remove for platform:`mulle-sourcetree mark mulle-stacktrace no-platform-<uname>`
+//        (use mulle-sourcetree-to-c --unames for known values)
 #include <mulle-stacktrace/mulle-stacktrace.h>   // mulle-stacktrace
 
 // You can tweak the following #include with these commands.
@@ -33,7 +34,8 @@
 //    toggle #include:    `mulle-sourcetree mark mulle-atinit [no-]import`
 //    toggle public:      `mulle-sourcetree mark mulle-atinit [no-]public`
 //    toggle optional:    `mulle-sourcetree mark mulle-atinit [no-]require`
-//    remove for platform:`mulle-sourcetree mark mulle-atinit no-platform-<name>`
+//    remove for platform:`mulle-sourcetree mark mulle-atinit no-platform-<uname>`
+//        (use mulle-sourcetree-to-c --unames for known values)
 #include <mulle-atinit/mulle-atinit.h>   // mulle-atinit
 
 // You can tweak the following #include with these commands.
@@ -44,7 +46,8 @@
 //    toggle #include:    `mulle-sourcetree mark mulle-atexit [no-]import`
 //    toggle public:      `mulle-sourcetree mark mulle-atexit [no-]public`
 //    toggle optional:    `mulle-sourcetree mark mulle-atexit [no-]require`
-//    remove for platform:`mulle-sourcetree mark mulle-atexit no-platform-<name>`
+//    remove for platform:`mulle-sourcetree mark mulle-atexit no-platform-<uname>`
+//        (use mulle-sourcetree-to-c --unames for known values)
 #include <mulle-atexit/mulle-atexit.h>   // mulle-atexit
 
 #endif
