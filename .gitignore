@@ -21,6 +21,7 @@ research/
 
 environment-os-*.sh
 environment-host-*.sh
+!environment-host-ci-*.sh
 
 blockset.h
 
