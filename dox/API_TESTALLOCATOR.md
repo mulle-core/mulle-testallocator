@@ -28,7 +28,7 @@ friends. Direct calls to `malloc` can not be tracked.
 
 ## Environment Variables
 
-Debug support can be turned on and off with environment variables
+Debug support can be turned on and off with environment variables.
 
 Variable                         | Description
 -------------------------------- | ------------------------------------
@@ -38,6 +38,10 @@ Variable                         | Description
 `MULLE_TESTALLOCATOR_FIRST_LEAK` | Only report the first leak if set to 1 or YES.
 `MULLE_TESTALLOCATOR_MAX_SIZE`   | Creates an out of memory condition if more than max size is allocated (in one call)
 
+> #### No support for scribble
+>
+> There is no "scribble" option for freed memory, as the library does not
+> track allocation sizes.
 
 
 ## Automatic startup is tricky and platform dependent
