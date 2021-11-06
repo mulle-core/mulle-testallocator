@@ -45,6 +45,9 @@
 #include <stdarg.h>
 
 
+//#define DEBUG_INITIALIZE
+
+
 #pragma clang diagnostic ignored "-Wparentheses"
 
 #pragma mark - track allocations
@@ -158,7 +161,7 @@ static void   reused_pointer_assert( void *p)
 {
    if( _pointerset_get( &local.allocations, p))
    {
-      log_stacktrace( "\n###\n### non-allocator freed block got reused: %p", p);
+      log_stacktrace( "\n###\n### a non-allocator-freed block got reused: %p", p);
       mulle_testallocator_bail( p);
    }
 }
@@ -530,7 +533,8 @@ static void   _mulle_testallocator_initialize( void *unused)
       trace_log_pointer( "allocator: mulle_default_allocator", &mulle_default_allocator);
       trace_log_pointer( "stdlib:    mulle_stdlib_allocator", &mulle_stdlib_allocator);
 
-      // keep old aba, and fail
+      // keep old aba, and fail function pointers
+      // scribbling over aba_free would be disastrous
       mulle_default_allocator.calloc  = test_calloc;
       mulle_default_allocator.realloc = test_realloc;
       mulle_default_allocator.free    = test_free;
@@ -553,7 +557,7 @@ void   mulle_testallocator_initialize( void)
 //   // this why ??
 //   _mulle_testallocator_initialize( NULL);
 //#else
-# ifdef DEBUG
+# ifdef DEBUG_INITIALIZE
    fprintf( stderr, "mulle_testallocator_initialize: mulle_atinit set for _mulle_testallocator_initialize\n");
 # endif
    // 1 meeelion priority!
