@@ -16,26 +16,26 @@
 
 // You can tweak the following #include with these commands.
 // (Use EFB20198-B38A-4725-B15A-85BB8206D940 instead of mulle-thread if there are duplicate entries)
-//    remove:             `mulle-sourcetree mark mulle-thread no-header`
+//    remove:             `mulle-sde dependency mark mulle-thread no-header`
 //    rename:             `mulle-sde dependency|library set mulle-thread include whatever.h`
-//    reorder:            `mulle-sourcetree move mulle-thread <up|down>`
-//    toggle #include:    `mulle-sourcetree mark mulle-thread [no-]import`
-//    toggle public:      `mulle-sourcetree mark mulle-thread [no-]public`
-//    toggle optional:    `mulle-sourcetree mark mulle-thread [no-]require`
-//    remove for platform:`mulle-sourcetree mark mulle-thread no-platform-<uname>`
-//        (use mulle-sourcetree-to-c --unames for known values)
+//    reorder:            `mulle-sde dependency move mulle-thread <up|down>`
+//    toggle #include:    `mulle-sde dependency mark mulle-thread [no-]import`
+//    toggle public:      `mulle-sde dependency mark mulle-thread [no-]public`
+//    toggle optional:    `mulle-sde dependency mark mulle-thread [no-]require`
+//    remove for platform:`mulle-sde dependency mark mulle-thread no-platform-<uname>`
+//        (use `mulle-sourcetree-to-c --unames` to list known values)
 #include <mulle-thread/mulle-thread.h>   // mulle-thread
 
 // You can tweak the following #include with these commands.
 // (Use 1636C30E-73CC-482C-98E5-F5FBBAF609A3 instead of mulle-allocator if there are duplicate entries)
-//    remove:             `mulle-sourcetree mark mulle-allocator no-header`
+//    remove:             `mulle-sde dependency mark mulle-allocator no-header`
 //    rename:             `mulle-sde dependency|library set mulle-allocator include whatever.h`
-//    reorder:            `mulle-sourcetree move mulle-allocator <up|down>`
-//    toggle #include:    `mulle-sourcetree mark mulle-allocator [no-]import`
-//    toggle public:      `mulle-sourcetree mark mulle-allocator [no-]public`
-//    toggle optional:    `mulle-sourcetree mark mulle-allocator [no-]require`
-//    remove for platform:`mulle-sourcetree mark mulle-allocator no-platform-<uname>`
-//        (use mulle-sourcetree-to-c --unames for known values)
+//    reorder:            `mulle-sde dependency move mulle-allocator <up|down>`
+//    toggle #include:    `mulle-sde dependency mark mulle-allocator [no-]import`
+//    toggle public:      `mulle-sde dependency mark mulle-allocator [no-]public`
+//    toggle optional:    `mulle-sde dependency mark mulle-allocator [no-]require`
+//    remove for platform:`mulle-sde dependency mark mulle-allocator no-platform-<uname>`
+//        (use `mulle-sourcetree-to-c --unames` to list known values)
 #include <mulle-allocator/mulle-allocator.h>   // mulle-allocator
 
 #endif
