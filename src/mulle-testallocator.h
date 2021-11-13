@@ -37,7 +37,7 @@
 #ifndef mulle_testallocator_h__
 #define mulle_testallocator_h__
 
-#include <mulle-allocator/mulle-allocator.h>
+#include "include.h"
 
 #include "mulle-testallocator-struct.h"
 

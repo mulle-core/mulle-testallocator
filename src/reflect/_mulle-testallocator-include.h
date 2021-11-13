@@ -15,7 +15,7 @@
 #define _mulle_testallocator_include_h__
 
 // You can tweak the following #include with these commands.
-// (Use EFB20198-B38A-4725-B15A-85BB8206D940 instead of mulle-thread if there are duplicate entries)
+// (Use 557D6E11-900A-499A-BCF2-23D58BA04C5D instead of mulle-thread if there are duplicate entries)
 //    remove:             `mulle-sde dependency mark mulle-thread no-header`
 //    rename:             `mulle-sde dependency|library set mulle-thread include whatever.h`
 //    reorder:            `mulle-sde dependency move mulle-thread <up|down>`
@@ -27,7 +27,7 @@
 #include <mulle-thread/mulle-thread.h>   // mulle-thread
 
 // You can tweak the following #include with these commands.
-// (Use 1636C30E-73CC-482C-98E5-F5FBBAF609A3 instead of mulle-allocator if there are duplicate entries)
+// (Use 5C3405CC-15C5-4602-AC79-FF22891F4ADE instead of mulle-allocator if there are duplicate entries)
 //    remove:             `mulle-sde dependency mark mulle-allocator no-header`
 //    rename:             `mulle-sde dependency|library set mulle-allocator include whatever.h`
 //    reorder:            `mulle-sde dependency move mulle-allocator <up|down>`
