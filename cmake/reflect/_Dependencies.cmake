@@ -12,9 +12,9 @@ if( MULLE_TRACE_INCLUDE)
 endif()
 
 #
-# Generated from sourcetree: EFB20198-B38A-4725-B15A-85BB8206D940;mulle-thread;no-all-load,no-cmake-searchpath,no-import,no-singlephase;
+# Generated from sourcetree: 557D6E11-900A-499A-BCF2-23D58BA04C5D;mulle-thread;no-all-load,no-cmake-searchpath,no-import,no-singlephase;
 # Disable with : `mulle-sourcetree mark mulle-thread no-link`
-# Disable for this platform: `mulle-sourcetree mark mulle-thread no-cmake-platform-windows`
+# Disable for this platform: `mulle-sourcetree mark mulle-thread no-cmake-platform-${MULLE_UNAME}`
 #
 if( NOT MULLE_THREAD_LIBRARY)
    find_library( MULLE_THREAD_LIBRARY NAMES ${CMAKE_STATIC_LIBRARY_PREFIX}mulle-thread${CMAKE_STATIC_LIBRARY_SUFFIX} mulle-thread NO_CMAKE_SYSTEM_PATH NO_SYSTEM_ENVIRONMENT_PATH)
@@ -83,9 +83,9 @@ endif()
 
 
 #
-# Generated from sourcetree: 1636C30E-73CC-482C-98E5-F5FBBAF609A3;mulle-allocator;no-all-load,no-cmake-inherit,no-import,no-singlephase;
+# Generated from sourcetree: 5C3405CC-15C5-4602-AC79-FF22891F4ADE;mulle-allocator;no-all-load,no-cmake-inherit,no-import,no-singlephase;
 # Disable with : `mulle-sourcetree mark mulle-allocator no-link`
-# Disable for this platform: `mulle-sourcetree mark mulle-allocator no-cmake-platform-windows`
+# Disable for this platform: `mulle-sourcetree mark mulle-allocator no-cmake-platform-${MULLE_UNAME}`
 #
 if( NOT MULLE_ALLOCATOR_LIBRARY)
    find_library( MULLE_ALLOCATOR_LIBRARY NAMES ${CMAKE_STATIC_LIBRARY_PREFIX}mulle-allocator${CMAKE_STATIC_LIBRARY_SUFFIX} mulle-allocator NO_CMAKE_SYSTEM_PATH NO_SYSTEM_ENVIRONMENT_PATH)
@@ -113,9 +113,9 @@ endif()
 
 
 #
-# Generated from sourcetree: DC0E6DE2-37B0-4CCF-BF12-F0C5C7F3A994;mulle-stacktrace;no-all-load,no-cmake-searchpath,no-import,no-public,no-singlephase;
+# Generated from sourcetree: B417A6CC-391E-466E-9516-27D754C8A317;mulle-stacktrace;no-all-load,no-cmake-searchpath,no-import,no-public,no-singlephase;
 # Disable with : `mulle-sourcetree mark mulle-stacktrace no-link`
-# Disable for this platform: `mulle-sourcetree mark mulle-stacktrace no-cmake-platform-windows`
+# Disable for this platform: `mulle-sourcetree mark mulle-stacktrace no-cmake-platform-${MULLE_UNAME}`
 #
 if( NOT MULLE_STACKTRACE_LIBRARY)
    find_library( MULLE_STACKTRACE_LIBRARY NAMES ${CMAKE_STATIC_LIBRARY_PREFIX}mulle-stacktrace${CMAKE_STATIC_LIBRARY_SUFFIX} mulle-stacktrace NO_CMAKE_SYSTEM_PATH NO_SYSTEM_ENVIRONMENT_PATH)
@@ -184,9 +184,9 @@ endif()
 
 
 #
-# Generated from sourcetree: 5A3C4A8D-C513-491E-A254-FCB2EAA4F8DE;mulle-atinit;no-cmake-searchpath,no-dynamic-link,no-import,no-intermediate-link,no-public,no-singlephase;
+# Generated from sourcetree: 1E64BF82-7365-41E3-94CA-3CF148B45533;mulle-atinit;no-cmake-searchpath,no-dynamic-link,no-import,no-intermediate-link,no-public,no-singlephase;
 # Disable with : `mulle-sourcetree mark mulle-atinit no-link`
-# Disable for this platform: `mulle-sourcetree mark mulle-atinit no-cmake-platform-windows`
+# Disable for this platform: `mulle-sourcetree mark mulle-atinit no-cmake-platform-${MULLE_UNAME}`
 #
 if( NOT MULLE_ATINIT_LIBRARY)
    find_library( MULLE_ATINIT_LIBRARY NAMES ${CMAKE_STATIC_LIBRARY_PREFIX}mulle-atinit${CMAKE_STATIC_LIBRARY_SUFFIX} NO_CMAKE_SYSTEM_PATH NO_SYSTEM_ENVIRONMENT_PATH)
@@ -264,9 +264,9 @@ endif()
 
 
 #
-# Generated from sourcetree: DA08D176-9F38-434B-AFCD-FD83A249E6ED;mulle-atexit;no-cmake-searchpath,no-dynamic-link,no-import,no-intermediate-link,no-public,no-singlephase;
+# Generated from sourcetree: 8CCFB85A-7AE3-452E-A231-A93918CDD6C8;mulle-atexit;no-cmake-searchpath,no-dynamic-link,no-import,no-intermediate-link,no-public,no-singlephase;
 # Disable with : `mulle-sourcetree mark mulle-atexit no-link`
-# Disable for this platform: `mulle-sourcetree mark mulle-atexit no-cmake-platform-windows`
+# Disable for this platform: `mulle-sourcetree mark mulle-atexit no-cmake-platform-${MULLE_UNAME}`
 #
 if( NOT MULLE_ATEXIT_LIBRARY)
    find_library( MULLE_ATEXIT_LIBRARY NAMES ${CMAKE_STATIC_LIBRARY_PREFIX}mulle-atexit${CMAKE_STATIC_LIBRARY_SUFFIX} NO_CMAKE_SYSTEM_PATH NO_SYSTEM_ENVIRONMENT_PATH)
@@ -339,5 +339,76 @@ if( NOT MULLE_ATEXIT_LIBRARY)
    else()
       # Disable with: `mulle-sourcetree mark mulle-atexit no-require-link`
       message( FATAL_ERROR "MULLE_ATEXIT_LIBRARY was not found")
+   endif()
+endif()
+
+
+#
+# Generated from sourcetree: 42A968F8-3B06-4645-B569-C459E9238D22;mulle-dlfcn;no-all-load,no-cmake-searchpath,no-import,no-public,no-singlephase;
+# Disable with : `mulle-sourcetree mark mulle-dlfcn no-link`
+# Disable for this platform: `mulle-sourcetree mark mulle-dlfcn no-cmake-platform-${MULLE_UNAME}`
+#
+if( NOT MULLE_DLFCN_LIBRARY)
+   find_library( MULLE_DLFCN_LIBRARY NAMES ${CMAKE_STATIC_LIBRARY_PREFIX}mulle-dlfcn${CMAKE_STATIC_LIBRARY_SUFFIX} mulle-dlfcn NO_CMAKE_SYSTEM_PATH NO_SYSTEM_ENVIRONMENT_PATH)
+   message( STATUS "MULLE_DLFCN_LIBRARY is ${MULLE_DLFCN_LIBRARY}")
+   #
+   # The order looks ascending, but due to the way this file is read
+   # it ends up being descending, which is what we need.
+   #
+   if( MULLE_DLFCN_LIBRARY)
+      #
+      # Add MULLE_DLFCN_LIBRARY to DEPENDENCY_LIBRARIES list.
+      # Disable with: `mulle-sourcetree mark mulle-dlfcn no-cmake-add`
+      #
+      set( DEPENDENCY_LIBRARIES
+         ${DEPENDENCY_LIBRARIES}
+         ${MULLE_DLFCN_LIBRARY}
+         CACHE INTERNAL "need to cache this"
+      )
+      #
+      # Inherit information from dependency.
+      # Encompasses: no-cmake-searchpath,no-cmake-dependency,no-cmake-loader
+      # Disable with: `mulle-sourcetree mark mulle-dlfcn no-cmake-inherit`
+      #
+      # temporarily expand CMAKE_MODULE_PATH
+      get_filename_component( _TMP_MULLE_DLFCN_ROOT "${MULLE_DLFCN_LIBRARY}" DIRECTORY)
+      get_filename_component( _TMP_MULLE_DLFCN_ROOT "${_TMP_MULLE_DLFCN_ROOT}" DIRECTORY)
+      #
+      #
+      # Search for "DependenciesAndLibraries.cmake" to include.
+      # Disable with: `mulle-sourcetree mark mulle-dlfcn no-cmake-dependency`
+      #
+      foreach( _TMP_MULLE_DLFCN_NAME "mulle-dlfcn")
+         set( _TMP_MULLE_DLFCN_DIR "${_TMP_MULLE_DLFCN_ROOT}/include/${_TMP_MULLE_DLFCN_NAME}/cmake")
+         # use explicit path to avoid "surprises"
+         if( EXISTS "${_TMP_MULLE_DLFCN_DIR}/DependenciesAndLibraries.cmake")
+            unset( MULLE_DLFCN_DEFINITIONS)
+            list( INSERT CMAKE_MODULE_PATH 0 "${_TMP_MULLE_DLFCN_DIR}")
+            # we only want top level INHERIT_OBJC_LOADERS, so disable them
+            if( NOT NO_INHERIT_OBJC_LOADERS)
+               set( NO_INHERIT_OBJC_LOADERS OFF)
+            endif()
+            list( APPEND _TMP_INHERIT_OBJC_LOADERS ${NO_INHERIT_OBJC_LOADERS})
+            set( NO_INHERIT_OBJC_LOADERS ON)
+            #
+            include( "${_TMP_MULLE_DLFCN_DIR}/DependenciesAndLibraries.cmake")
+            #
+            list( GET _TMP_INHERIT_OBJC_LOADERS -1 NO_INHERIT_OBJC_LOADERS)
+            list( REMOVE_AT _TMP_INHERIT_OBJC_LOADERS -1)
+            #
+            list( REMOVE_ITEM CMAKE_MODULE_PATH "${_TMP_MULLE_DLFCN_DIR}")
+            set( INHERITED_DEFINITIONS
+               ${INHERITED_DEFINITIONS}
+               ${MULLE_DLFCN_DEFINITIONS}
+               CACHE INTERNAL "need to cache this"
+            )
+            break()
+         else()
+            message( STATUS "${_TMP_MULLE_DLFCN_DIR}/DependenciesAndLibraries.cmake not found")
+         endif()
+      endforeach()
+   else()
+      # Disable with: `mulle-sourcetree mark mulle-dlfcn no-require-link`
+      message( FATAL_ERROR "MULLE_DLFCN_LIBRARY was not found")
    endif()
 endif()

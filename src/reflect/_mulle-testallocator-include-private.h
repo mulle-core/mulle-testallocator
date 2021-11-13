@@ -15,7 +15,7 @@
 #define _mulle_testallocator_include_private_h__
 
 // You can tweak the following #include with these commands.
-// (Use DC0E6DE2-37B0-4CCF-BF12-F0C5C7F3A994 instead of mulle-stacktrace if there are duplicate entries)
+// (Use B417A6CC-391E-466E-9516-27D754C8A317 instead of mulle-stacktrace if there are duplicate entries)
 //    remove:             `mulle-sde dependency mark mulle-stacktrace no-header`
 //    rename:             `mulle-sde dependency|library set mulle-stacktrace include whatever.h`
 //    reorder:            `mulle-sde dependency move mulle-stacktrace <up|down>`
@@ -27,7 +27,7 @@
 #include <mulle-stacktrace/mulle-stacktrace.h>   // mulle-stacktrace
 
 // You can tweak the following #include with these commands.
-// (Use 5A3C4A8D-C513-491E-A254-FCB2EAA4F8DE instead of mulle-atinit if there are duplicate entries)
+// (Use 1E64BF82-7365-41E3-94CA-3CF148B45533 instead of mulle-atinit if there are duplicate entries)
 //    remove:             `mulle-sde dependency mark mulle-atinit no-header`
 //    rename:             `mulle-sde dependency|library set mulle-atinit include whatever.h`
 //    reorder:            `mulle-sde dependency move mulle-atinit <up|down>`
@@ -39,7 +39,7 @@
 #include <mulle-atinit/mulle-atinit.h>   // mulle-atinit
 
 // You can tweak the following #include with these commands.
-// (Use DA08D176-9F38-434B-AFCD-FD83A249E6ED instead of mulle-atexit if there are duplicate entries)
+// (Use 8CCFB85A-7AE3-452E-A231-A93918CDD6C8 instead of mulle-atexit if there are duplicate entries)
 //    remove:             `mulle-sde dependency mark mulle-atexit no-header`
 //    rename:             `mulle-sde dependency|library set mulle-atexit include whatever.h`
 //    reorder:            `mulle-sde dependency move mulle-atexit <up|down>`
@@ -49,5 +49,17 @@
 //    remove for platform:`mulle-sde dependency mark mulle-atexit no-platform-<uname>`
 //        (use `mulle-sourcetree-to-c --unames` to list known values)
 #include <mulle-atexit/mulle-atexit.h>   // mulle-atexit
+
+// You can tweak the following #include with these commands.
+// (Use 42A968F8-3B06-4645-B569-C459E9238D22 instead of mulle-dlfcn if there are duplicate entries)
+//    remove:             `mulle-sde dependency mark mulle-dlfcn no-header`
+//    rename:             `mulle-sde dependency|library set mulle-dlfcn include whatever.h`
+//    reorder:            `mulle-sde dependency move mulle-dlfcn <up|down>`
+//    toggle #include:    `mulle-sde dependency mark mulle-dlfcn [no-]import`
+//    toggle public:      `mulle-sde dependency mark mulle-dlfcn [no-]public`
+//    toggle optional:    `mulle-sde dependency mark mulle-dlfcn [no-]require`
+//    remove for platform:`mulle-sde dependency mark mulle-dlfcn no-platform-<uname>`
+//        (use `mulle-sourcetree-to-c --unames` to list known values)
+#include <mulle-dlfcn/mulle-dlfcn.h>   // mulle-dlfcn
 
 #endif
