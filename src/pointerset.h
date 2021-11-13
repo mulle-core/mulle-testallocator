@@ -108,8 +108,8 @@ static inline uint64_t   avalanche64(uint64_t h)
 static inline uintptr_t   avalanche( uintptr_t h)
 {
    if( sizeof( uintptr_t) == sizeof( uint64_t))
-      return( avalanche64( h));
-   return( avalanche32( h));
+      return( (uintptr_t) avalanche64( h));
+   return( (uintptr_t) avalanche32( h));
 }
 
 

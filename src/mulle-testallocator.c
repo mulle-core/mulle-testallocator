@@ -490,7 +490,6 @@ static void   mulle_testallocator_exit()
 static void   _mulle_testallocator_initialize( void *unused)
 {
    int    rval;
-   char   *s;
 
    if( local.trace != mulle_testallocator_trace_disabled)
       return;
@@ -520,7 +519,7 @@ static void   _mulle_testallocator_initialize( void *unused)
          with mulle_atexit. For this we lazy link mulle_atexit and just don't
          do the codepath if mulle_atexit is not available.
       */
-      void  (*p_mulle_atexit)( void (*)( void (*)(void)));
+      void  (*p_mulle_atexit)( void (*)(void));
 
       p_mulle_atexit = dlsym( MULLE_RTLD_DEFAULT, "mulle_atexit");
       if( ! p_mulle_atexit)
