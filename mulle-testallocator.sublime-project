@@ -2,16 +2,38 @@
 	"folders":
 	[
 		{
-			"path": ".",
-         "folder_exclude_patterns": [
-         "build",
-         ".mulle-*",
-         ".git",
-         "stash",
-         "addiction",
-         "dependency",
-         ".unison*"
-         ]
+			"folder_exclude_patterns":
+			[
+				"build",
+				".mulle-*",
+				".git",
+				"stash",
+				"addiction",
+				"dependency",
+				".unison*"
+			],
+			"path": "."
+		},
+		{
+			"path": "E:\\home\\nat\\srcO\\mulle-core\\mulle-atexit"
+		},
+		{
+			"path": "E:\\home\\nat\\srcO\\mulle-core\\mulle-stacktrace"
+		},
+		{
+			"path": "E:\\home\\nat\\srcO\\mulle-c\\mulle-c11"
+		},
+		{
+			"path": "E:\\home\\nat\\srcO\\mulle-core\\mulle-dlfcn"
+		},
+		{
+			"path": "E:\\home\\nat\\srcO\\mulle-c\\mulle-data"
+		},
+		{
+			"path": "E:\\home\\nat\\srcO\\mulle-c\\mulle-buffer"
+		},
+		{
+			"path": "E:\\home\\nat\\srcO\\mulle-c\\mulle-allocator"
 		}
 	]
 }
