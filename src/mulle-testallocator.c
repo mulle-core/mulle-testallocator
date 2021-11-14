@@ -548,7 +548,8 @@ static void   _mulle_testallocator_initialize( void *unused)
 }
 
 
-MULLE_C_CONSTRUCTOR( mulle_testallocator_initialize)
+// fun fact, in a windows a comstructor is automatically 
+// hidden
 void   mulle_testallocator_initialize( void)
 {
 //#ifdef __APPLE__
@@ -562,6 +563,13 @@ void   mulle_testallocator_initialize( void)
    // 1 meeelion priority!
    mulle_atinit( _mulle_testallocator_initialize, NULL, 1000000);
 //#endif
+}
+
+
+MULLE_C_CONSTRUCTOR( load)
+static void   load( void)
+{
+   mulle_testallocator_initialize();
 }
 
 

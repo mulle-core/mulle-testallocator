@@ -46,9 +46,16 @@
 MULLE_ALLOCATOR_EXTERN_GLOBAL struct _mulle_testallocator_config   mulle_testallocator_config;
 MULLE_ALLOCATOR_EXTERN_GLOBAL struct mulle_allocator               mulle_testallocator;
 
+MULLE_TESTALLOCATOR_EXTERN_GLOBAL
 void   mulle_testallocator_initialize( void);
+
+MULLE_TESTALLOCATOR_EXTERN_GLOBAL
 void   mulle_testallocator_reset_detect_leaks( int detect);
+
+MULLE_TESTALLOCATOR_EXTERN_GLOBAL
 void   mulle_testallocator_set_tracelevel( unsigned int value); // 0,1,2 -1 turns off
+
+MULLE_TESTALLOCATOR_EXTERN_GLOBAL
 void   mulle_testallocator_set_max_size( size_t value); // 0 turns off
 
 //
@@ -58,6 +65,7 @@ void   mulle_testallocator_set_max_size( size_t value); // 0 turns off
 // We don't want to expose stacktrace here though, so we'd use a generic
 // functionpointer if that existed. Instead we just use a void one.
 //
+MULLE_TESTALLOCATOR_EXTERN_GLOBAL
 void   mulle_testallocator_set_stacktracesymbolizer( void (*f)( void));
 
 // start a clean sheet, without leak checking
@@ -77,10 +85,14 @@ static inline void   mulle_testallocator_reset( void)
 // test allocator propery. Do this at the end of a test, if you used
 // mulle_testallocator_discard.
 //
+MULLE_TESTALLOCATOR_EXTERN_GLOBAL
 void   mulle_testallocator_cancel( void);
 
 // unlocked functions, rarely useful
+MULLE_TESTALLOCATOR_EXTERN_GLOBAL
 void   _mulle_testallocator_reset( void);
+
+MULLE_TESTALLOCATOR_EXTERN_GLOBAL
 void   _mulle_testallocator_detect_leaks( void);
 
 #endif /* mulle_testallocator_h */
