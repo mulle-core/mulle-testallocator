@@ -35,6 +35,7 @@ src/include-private.h
 set( PUBLIC_GENERATED_HEADERS
 src/reflect/_mulle-testallocator-include.h
 src/reflect/_mulle-testallocator-provide.h
+src/reflect/_mulle-testallocator-versioncheck.h
 )
 
 #

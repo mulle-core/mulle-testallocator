@@ -41,7 +41,7 @@
 
 #include "mulle-testallocator-struct.h"
 
-#define MULLE_TESTALLOCATOR_VERSION    ((4 << 20) | (2 << 8) | 3)
+#define MULLE_TESTALLOCATOR_VERSION    ((4 << 20) | (2 << 8) | 4)
 
 MULLE_ALLOCATOR_EXTERN_GLOBAL struct _mulle_testallocator_config   mulle_testallocator_config;
 MULLE_ALLOCATOR_EXTERN_GLOBAL struct mulle_allocator               mulle_testallocator;
@@ -94,5 +94,12 @@ void   _mulle_testallocator_reset( void);
 
 MULLE_TESTALLOCATOR_EXTERN_GLOBAL
 void   _mulle_testallocator_detect_leaks( void);
+
+
+#ifdef __has_include
+# if __has_include( "_mulle-testallocator-versioncheck.h")
+#  include "_mulle-testallocator-versioncheck.h"
+# endif
+#endif
 
 #endif /* mulle_testallocator_h */
