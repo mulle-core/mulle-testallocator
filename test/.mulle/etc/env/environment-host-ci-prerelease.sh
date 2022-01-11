@@ -1,4 +1,22 @@
 #
+# mulle-testallocator nodetype: ${MULLE_TESTALLOCATOR_NODETYPE:-tar}
+#
+export MULLE_TESTALLOCATOR_NODETYPE="git"
+
+
+#
+# mulle-testallocator url: ${MULLE_TESTALLOCATOR_URL:-https://github.com/mulle-core/mulle-testallocator/archive/${MULLE_TAG}.tar.gz}
+#
+export MULLE_TESTALLOCATOR_URL="https://github.com/mulle-core/mulle-testallocator.git"
+
+
+#
+# mulle-testallocator branch: ${MULLE_TESTALLOCATOR_BRANCH}
+#
+export MULLE_TESTALLOCATOR_BRANCH="prerelease"
+
+
+#
 # mulle-thread nodetype: ${MULLE_THREAD_NODETYPE:-tar}
 #
 export MULLE_THREAD_NODETYPE="git"
@@ -86,6 +104,24 @@ export MULLE_DLFCN_URL="https://github.com/mulle-core/mulle-dlfcn.git"
 # mulle-dlfcn branch: ${MULLE_DLFCN_BRANCH}
 #
 export MULLE_DLFCN_BRANCH="prerelease"
+
+
+#
+# dlfcn-win32 nodetype: ${DLFCN_WIN32_NODETYPE:-tar}
+#
+export DLFCN_WIN32_NODETYPE="git"
+
+
+#
+# dlfcn-win32 url: ${DLFCN_WIN32_URL:-https://github.com/mulle-core/dlfcn-win32/archive/refs/tags/${MULLE_TAG}.tar.gz}
+#
+export DLFCN_WIN32_URL="https://github.com/mulle-core/dlfcn-win32.git"
+
+
+#
+# dlfcn-win32 branch: ${DLFCN_WIN32_BRANCH}
+#
+export DLFCN_WIN32_BRANCH="prerelease"
 
 
 #
