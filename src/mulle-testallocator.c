@@ -90,7 +90,7 @@ static struct
 // unintialized data gets name mangled by cl.exe
 // initialized data fortunately not
 //
-MULLE_C_GLOBAL struct _mulle_testallocator_config    mulle_testallocator_config  =
+struct _mulle_testallocator_config    mulle_testallocator_config  =
 {
 #ifdef _WIN32
    1
@@ -340,7 +340,6 @@ static void  test_free( void *p)
 
 #pragma mark - global variable
 
-MULLE_C_GLOBAL
 struct mulle_allocator   mulle_testallocator =
 {
    test_calloc,

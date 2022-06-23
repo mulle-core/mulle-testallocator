@@ -21,8 +21,14 @@
 
 #include "_mulle-testallocator-include.h"
 
-#ifndef MULLE_TESTALLOCATOR_EXTERN_GLOBAL
-# define MULLE_TESTALLOCATOR_EXTERN_GLOBAL MULLE_C_EXTERN_GLOBAL
+#ifdef MULLE_TESTALLOCATOR_BUILD
+# define MULLE_TESTALLOCATOR_GLOBAL    MULLE_C_GLOBAL
+#else
+# if defined( MULLE_TESTALLOCATOR_INCLUDE_DYNAMIC) || (defined( MULLE_INCLUDE_DYNAMIC) && ! defined( MULLE_TESTALLOCATOR_INCLUDE_STATIC))
+#  define MULLE_TESTALLOCATOR_GLOBAL   MULLE_C_EXTERN_GLOBAL
+# else
+#  define MULLE_TESTALLOCATOR_GLOBAL   extern
+# endif
 #endif
 
 /* You can add some more include statements here */
