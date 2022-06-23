@@ -3,7 +3,7 @@
  *   Any edits will be lost.
  */
 #if defined( MULLE_ALLOCATOR_VERSION)
-# if MULLE_ALLOCATOR_VERSION < ((4 << 20) | (2 << 8) | 4)
+# if MULLE_ALLOCATOR_VERSION < ((4 << 20) | (2 << 8) | 5)
 #  error "mulle-allocator is too old"
 # endif
 # if MULLE_ALLOCATOR_VERSION >= ((5 << 20) | (0 << 8) | 0)
@@ -12,7 +12,7 @@
 #endif
 
 #if defined( MULLE_ATEXIT_VERSION)
-# if MULLE_ATEXIT_VERSION < ((0 << 20) | (0 << 8) | 10)
+# if MULLE_ATEXIT_VERSION < ((0 << 20) | (0 << 8) | 11)
 #  error "mulle-atexit is too old"
 # endif
 # if MULLE_ATEXIT_VERSION >= ((0 << 20) | (1 << 8) | 0)
@@ -21,7 +21,7 @@
 #endif
 
 #if defined( MULLE_ATINIT_VERSION)
-# if MULLE_ATINIT_VERSION < ((0 << 20) | (0 << 8) | 7)
+# if MULLE_ATINIT_VERSION < ((0 << 20) | (0 << 8) | 8)
 #  error "mulle-atinit is too old"
 # endif
 # if MULLE_ATINIT_VERSION >= ((0 << 20) | (1 << 8) | 0)
@@ -30,7 +30,7 @@
 #endif
 
 #if defined( MULLE_DLFCN_VERSION)
-# if MULLE_DLFCN_VERSION < ((0 << 20) | (0 << 8) | 8)
+# if MULLE_DLFCN_VERSION < ((0 << 20) | (0 << 8) | 9)
 #  error "mulle-dlfcn is too old"
 # endif
 # if MULLE_DLFCN_VERSION >= ((0 << 20) | (1 << 8) | 0)
@@ -39,7 +39,7 @@
 #endif
 
 #if defined( MULLE_STACKTRACE_VERSION)
-# if MULLE_STACKTRACE_VERSION < ((0 << 20) | (2 << 8) | 4)
+# if MULLE_STACKTRACE_VERSION < ((0 << 20) | (2 << 8) | 5)
 #  error "mulle-stacktrace is too old"
 # endif
 # if MULLE_STACKTRACE_VERSION >= ((0 << 20) | (3 << 8) | 0)
@@ -48,7 +48,7 @@
 #endif
 
 #if defined( MULLE_THREAD_VERSION)
-# if MULLE_THREAD_VERSION < ((4 << 20) | (4 << 8) | 0)
+# if MULLE_THREAD_VERSION < ((4 << 20) | (4 << 8) | 1)
 #  error "mulle-thread is too old"
 # endif
 # if MULLE_THREAD_VERSION >= ((5 << 20) | (0 << 8) | 0)
