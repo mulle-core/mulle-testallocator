@@ -8,7 +8,7 @@ mulle-testallocator is a leak and double free checker for tests
 
 | Release Version
 |-----------------------------------
-[![Build Status](//github.com/mulle-core/mulle-testallocator/CI/badge.svg?branch=release)](//github.com/mulle-core/mulle-testallocator) | ![Mulle kybernetiK tag](//img.shields.io/github/tag/mulle-core/mulle-testallocator.svg?branch=release) [![Build Status](//github.com/mulle-core/mulle-testallocator/CI/badge.svg?branch=release)](//github.com/mulle-core/mulle-testallocator)
+[![Build Status](https://github.com/mulle-core/mulle-testallocator/CI/badge.svg?branch=release)](//github.com/mulle-core/mulle-testallocator) | ![Mulle kybernetiK tag](https://img.shields.io/github/tag/mulle-core/mulle-testallocator.svg?branch=release) [![Build Status](https://github.com/mulle-core/mulle-testallocator/CI/badge.svg?branch=release)](//github.com/mulle-core/mulle-testallocator)
 
 
 ###  Use `mulle_testallocator` for leak detection
