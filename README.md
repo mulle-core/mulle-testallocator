@@ -8,7 +8,7 @@ mulle-testallocator is a leak and double free checker for tests
 
 | Release Version
 |-----------------------------------
-[![Build Status](https://github.com/mulle-core/mulle-testallocator/CI/badge.svg?branch=release)](//github.com/mulle-core/mulle-testallocator) | ![Mulle kybernetiK tag](https://img.shields.io/github/tag/mulle-core/mulle-testallocator.svg?branch=release) [![Build Status](https://github.com/mulle-core/mulle-testallocator/CI/badge.svg?branch=release)](//github.com/mulle-core/mulle-testallocator)
+|[![Build Status](https://github.com/mulle-core/mulle-testallocator/workflows/CI/badge.svg?branch=release)](//github.com/mulle-core/mulle-testallocator)  ![Mulle kybernetiK tag](https://img.shields.io/github/tag/mulle-core/mulle-testallocator/workflows/CI/badge.svg?branch=release)
 
 
 ###  Use `mulle_testallocator` for leak detection
@@ -17,7 +17,7 @@ Use `mulle_malloc` and friends instead of `malloc` in your code.
 
 So instead of:
 
-```
+``` c
    malloc( 1848);
    calloc( 18, 48);
    s = strdup( "VfL Bochum 1848");
@@ -27,7 +27,7 @@ So instead of:
 
 write
 
-```
+``` c
    mulle_malloc( 1848);
    mulle_calloc( 18, 48);
    s = mulle_strdup( "VfL Bochum 1848");
@@ -52,7 +52,7 @@ mulle-testallocator will tell you your leaks when the executable exits.
 
 Or you can wrap your code inside the following piece of code:
 
-```
+``` c
 mulle_testallocator_initialize();
 mulle_default_allocator = mulle_testallocator;
 {
@@ -74,7 +74,7 @@ wrong pointers.
 >
 > Locate Objective-C leaks easily with
 >
-> ```
+> ``` sh
 > MULLE_OBJC_EPHEMERAL_SINGLETON=YES \
 > MULLE_OBJC_TRACE_INSTANCE=YES \
 > MULLE_OBJC_TRACE_METHOD_CALL=YES \
@@ -111,7 +111,7 @@ All platforms and compilers supported by
 
 Use [mulle-sde](//github.com/mulle-sde) to add mulle-testallocator to your project:
 
-```
+``` sh
 mulle-sde dependency add --marks all-load,no-singlephase \
                          --github mulle-core \
                          mulle-testallocator
@@ -123,7 +123,7 @@ mulle-sde dependency add --marks all-load,no-singlephase \
 
 Use [mulle-sde](//github.com/mulle-sde) to build and install mulle-testallocator and all dependencies:
 
-```
+``` sh
 mulle-sde install --prefix /usr/local \
    //github.com/mulle-core/mulle-testallocator/archive/latest.tar.gz
 ```
@@ -144,7 +144,7 @@ Requirements                                                 | Description
 
 Install into `/usr/local`:
 
-```
+``` sh
 mkdir build 2> /dev/null
 (
    cd build ;
