@@ -167,7 +167,7 @@ static void   reused_pointer_assert( void *p)
 }
 
 
-static void  *test_realloc( void *q, size_t size)
+static void  *test_realloc( void *q, size_t size, struct mulle_allocator *unused)
 {
    void   *p;
    void   *old;
@@ -252,7 +252,7 @@ static void  *test_realloc( void *q, size_t size)
 }
 
 
-static void  *test_calloc( size_t n, size_t size)
+static void  *test_calloc( size_t n, size_t size, struct mulle_allocator *unused)
 {
    void   *p;
 
@@ -284,14 +284,14 @@ static void  *test_calloc( size_t n, size_t size)
    if( local.trace & mulle_testallocator_trace_verbose)
    {
       log_stacktrace( "alloced %p-%p",
-               p, &((char *)p)[ n * size ? n * size - 1 : 0]);
+               p, &((char *) p)[ n * size ? n * size - 1 : 0]);
    }
 
    return( p);
 }
 
 
-static void  test_free( void *p)
+static void  test_free( void *p, struct mulle_allocator *unused)
 {
    void   *q;
 
@@ -346,7 +346,7 @@ struct mulle_allocator   mulle_testallocator =
    test_realloc,
    test_free,
    mulle_allocation_fail,
-   (int (*)(void *, void (*)(void *), void *)) abort
+   (mulle_allocator_aba_t) abort
 };
 
 
