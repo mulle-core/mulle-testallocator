@@ -1,6 +1,6 @@
 {
    "name" : "mulle-testallocator",
-   "version" : "4.2.2",
+   "version" : "5.0.0",
    "description" : "🔄 C memory leak and double free checking",
    "homepage" : "https://github.com/mulle-core/mulle-testallocator",
    "bugs" : "https://github.com/mulle-core/mulle-testallocator/issues",
@@ -11,10 +11,14 @@
       "url" : "mulle-core/mulle-testallocator"
    },
    "dependencies" : {
-      "mulle-thread" : "mulle-concurrent/mulle-thread",
-      "mulle-allocator" : "mulle-c/mulle-allocator",
-      "mulle-stacktrace" : "mulle-core/mulle-stacktrace",
-      "mulle-atinit" : "mulle-core/mulle-atinit",
-      "mulle-atexit" : "mulle-core/mulle-atexit"
+      "mulle-thread" : "git://github.com/mulle-concurrent/mulle-thread",
+      "mulle-c11" : "git://github.com/mulle-c/mulle-c11",
+      "mintomic" : "git://github.com/mulle-concurrent/mintomic",
+      "mulle-allocator" : "git://github.com/mulle-c/mulle-allocator",
+      "mulle-stacktrace" : "git://github.com/mulle-core/mulle-stacktrace",
+      "mulle-dlfcn" : "git://github.com/mulle-core/mulle-dlfcn",
+      "dlfcn-win32" : "git://github.com/mulle-core/dlfcn-win32",
+      "mulle-atinit" : "git://github.com/mulle-core/mulle-atinit",
+      "mulle-atexit" : "git://github.com/mulle-core/mulle-atexit"
    }
 }
