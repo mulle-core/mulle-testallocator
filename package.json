@@ -8,7 +8,7 @@
    "license" : "BSD-3-Clause",
    "repository" : {
       "type" : "git",
-      "url" : "mulle-core/mulle-testallocator"
+      "url" : "github:mulle-core/mulle-testallocator"
    },
    "dependencies" : {
       "mulle-thread" : "git://github.com/mulle-concurrent/mulle-thread",
