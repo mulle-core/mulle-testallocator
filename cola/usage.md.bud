@@ -1,0 +1,80 @@
+## Usage
+
+###  Use `mulle_testallocator` for leak detection
+
+Use `mulle_malloc` and friends instead of `malloc` in your code.
+
+So instead of:
+
+``` c
+   malloc( 1848);
+   calloc( 18, 48);
+   s = strdup( "VfL Bochum 1848");
+   realloc( s, 18);
+   free( s);
+```
+
+write
+
+``` c
+   mulle_malloc( 1848);
+   mulle_calloc( 18, 48);
+   s = mulle_strdup( "VfL Bochum 1848");
+   mulle_realloc( s, 18);
+   mulle_free( s);
+```
+
+Now you can easily check for leaks using this `mulle_testallocator` library.
+Just run your code with the environment variable MULLE_TESTALLOCATOR
+set to YES.
+mulle-testallocator will tell you your leaks when the executable exits.
+
+> #### Note
+>
+> This feature needs a C-compiler that handles `__attribute__(((constructor))`.
+>
+> The order of constructor and atexit calls is dependent on the link order.
+> To catch all leaks, it is advantageous to link mulle-testallocator ahead of
+> all other code. You should also use [whole archive linking](//stackoverflow.com/questions/25038974/force-load-linker-flag-for-other-platforms) as otherwise the
+> library may just be omitted from the link.
+
+
+#### Manual method
+
+Or you can wrap your code inside the following piece of code:
+
+``` c
+mulle_testallocator_initialize();
+mulle_default_allocator = mulle_testallocator;
+{
+   mulle_malloc( 1848);
+   mulle_calloc( 18, 48);
+   s = mulle_strdup( "VfL Bochum 1848");
+   mulle_realloc( s, 18);
+   mulle_free( s);
+}
+mulle_testallocator_reset();
+```
+
+and `mulle_testallocator_reset` will tell you about your leaks. You
+don't need the 'constructor' support then.
+
+All `mulle_testallocator` routines will check for erroneous frees and
+wrong pointers.
+
+> #### Tip
+>
+> Locate Objective-C leaks easily with
+>
+> ``` sh
+> MULLE_OBJC_EPHEMERAL_SINGLETON=YES \
+> MULLE_OBJC_TRACE_INSTANCE=YES \
+> MULLE_OBJC_TRACE_METHOD_CALL=YES \
+> MULLE_TESTALLOCATOR_TRACE=2 \
+>    ./kitchen/Debug/myexe
+> ```
+> Then search for the leak address and you will see the method that
+> allocated the leak.
+>
+
+
