@@ -1,0 +1,7 @@
+## API
+
+You can configure trace output and other properties of the
+[Test Allocator](dox/API_TESTALLOCATOR.md) via the API or environment
+variables.
+
+

@@ -1,0 +1,30 @@
+{
+   "name" : "mulle-testallocator",
+   "version" : "5.0.0",
+   "description" : "C memory leak and double free checking",
+   "keywords" : [],
+   "license" : "BSD-3-Clause",
+   "repo" : "mulle-core/mulle-testallocator",
+   "src" : [
+      "src/generic/include-private.h",
+      "src/generic/include.h",
+      "src/mulle-testallocator-standalone.c",
+      "src/mulle-testallocator-struct.h",
+      "src/mulle-testallocator.c",
+      "src/mulle-testallocator.h",
+      "src/pointerarray.h",
+      "src/pointerset.h",
+      "src/reflect/_mulle-testallocator-include-private.h",
+      "src/reflect/_mulle-testallocator-include.h",
+      "src/reflect/_mulle-testallocator-provide.h",
+      "src/reflect/_mulle-testallocator-versioncheck.h"
+   ],
+   "dependencies" : {
+      "mulle-concurrent/mulle-thread": "*",
+      "mulle-c/mulle-allocator": "*",
+      "mulle-core/mulle-stacktrace": "*",
+      "mulle-core/mulle-atinit": "*",
+      "mulle-core/mulle-atexit": "*",
+      "mulle-core/mulle-dlfcn": "*"
+   }
+}

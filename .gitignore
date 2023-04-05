@@ -57,3 +57,6 @@ addiction/
 version.old
 .gdb_history
 .ackrc
+wilted/
+mulle-template-composer-*
+mulle-markdown-preview-*.html
