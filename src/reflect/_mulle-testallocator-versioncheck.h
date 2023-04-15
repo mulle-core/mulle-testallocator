@@ -21,7 +21,7 @@
 #endif
 
 #if defined( MULLE_ATINIT_VERSION)
-# if MULLE_ATINIT_VERSION < ((0 << 20) | (0 << 8) | 9)
+# if MULLE_ATINIT_VERSION < ((0 << 20) | (0 << 8) | 10)
 #  error "mulle-atinit is too old"
 # endif
 # if MULLE_ATINIT_VERSION >= ((0 << 20) | (1 << 8) | 0)
