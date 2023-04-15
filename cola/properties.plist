@@ -1,0 +1,63 @@
+{
+   project =
+   {
+      description="🔄 C memory leak and double free checking";
+      domain="github";
+      name="mulle-testallocator";
+      user="mulle-core";
+      repo="mulle-testallocator";
+      homepage="https://github.com/mulle-core/mulle-testallocator";
+      license="BSD-3-Clause"
+   };
+   dependencies =
+   (
+      {
+         description="🔠 Cross-platform thread/mutex/tss/atomic operations in C";
+         domain="github";
+         name="mulle-thread";
+         repo="mulle-thread";
+         url="https://github.com/mulle-concurrent/mulle-thread";
+         user="mulle-concurrent";
+      },
+      {
+         description="🔄 Flexible C memory allocation scheme";
+         domain="github";
+         name="mulle-allocator";
+         repo="mulle-allocator";
+         url="https://github.com/mulle-c/mulle-allocator";
+         user="mulle-c";
+      },
+      {
+         description="👣 Stracktrace support for various OS";
+         domain="github";
+         name="mulle-stacktrace";
+         repo="mulle-stacktrace";
+         url="https://github.com/mulle-core/mulle-stacktrace";
+         user="mulle-core";
+      },
+      {
+         description="🤱🏼 Compatibility library for deterministic initializers";
+         domain="github";
+         name="mulle-atinit";
+         repo="mulle-atinit";
+         url="https://github.com/mulle-core/mulle-atinit";
+         user="mulle-core";
+      },
+      {
+         description="👼 Compatibility library to fix atexit";
+         domain="github";
+         name="mulle-atexit";
+         repo="mulle-atexit";
+         url="https://github.com/mulle-core/mulle-atexit";
+         user="mulle-core";
+      },
+      {
+         description="♿️ Shared library helper";
+         domain="github";
+         name="mulle-dlfcn";
+         repo="mulle-dlfcn";
+         url="https://github.com/mulle-core/mulle-dlfcn";
+         user="mulle-core";
+      }
+   )
+}
