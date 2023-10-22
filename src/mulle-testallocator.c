@@ -560,7 +560,7 @@ void   mulle_testallocator_initialize( void)
    fprintf( stderr, "mulle_testallocator_initialize: mulle_atinit set for _mulle_testallocator_initialize\n");
 # endif
    // 1 meeelion priority!
-   mulle_atinit( _mulle_testallocator_initialize, NULL, 1000000);
+   mulle_atinit( _mulle_testallocator_initialize, NULL, 1000000, "mulle_testallocator");
 //#endif
 }
 
