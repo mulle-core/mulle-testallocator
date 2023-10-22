@@ -174,12 +174,12 @@ wrong pointers.
 > Locate Objective-C leaks easily with
 >
 > ``` sh
-> MULLE_OBJC_EPHEMERAL_SINGLETON=YES \
-> MULLE_OBJC_TRACE_INSTANCE=YES \
-> MULLE_OBJC_TRACE_METHOD_CALL=YES \
-> MULLE_TESTALLOCATOR_TRACE=2 \
+> MULLE_OBJC_PEDANTIC_EXIT=YES MULLE_TESTALLOCATOR=YES \
+> MULLE_OBJC_EPHEMERAL_SINGLETON=YES MULLE_OBJC_TRACE_INSTANCE=YES \
+> MULLE_OBJC_TRACE_METHOD_CALL=YES MULLE_TESTALLOCATOR_TRACE=2 \
 >    ./kitchen/Debug/myexe
 > ```
+>
 > Then search for the leak address and you will see the method that
 > allocated the leak.
 >
@@ -191,17 +191,16 @@ wrong pointers.
 
 ## Add
 
-**This project is a component of the [mulle-core](//github.com/mulle-core/mulle-core) library. As such you usually will *not* add or install it
-individually, unless you specifically do not want to link against
-`mulle-core`.**
-
 
 ### Add as an individual component
 
 Use [mulle-sde](//github.com/mulle-sde) to add mulle-testallocator to your project:
 
+
 ``` sh
-mulle-sde add github:mulle-core/mulle-testallocator
+mulle-sde dependency add --marks all-load,no-singlephase \
+                         --github mulle-core \
+                         mulle-testallocator
 ```
 
 To only add the sources of mulle-testallocator with dependency
@@ -238,6 +237,8 @@ Install the requirements:
 | [mulle-atinit](https://github.com/mulle-core/mulle-atinit)             | 🤱🏼 Compatibility library for deterministic initializers
 | [mulle-atexit](https://github.com/mulle-core/mulle-atexit)             | 👼 Compatibility library to fix atexit
 | [mulle-dlfcn](https://github.com/mulle-core/mulle-dlfcn)             | ♿️ Shared library helper
+
+Download the latest [tar](https://github.com/mulle-core/mulle-testallocator/archive/refs/tags/latest.tar.gz) or [zip](https://github.com/mulle-core/mulle-testallocator/archive/refs/tags/latest.zip) archive and unpack it.
 
 Install **mulle-testallocator** into `/usr/local` with [cmake](https://cmake.org):
 

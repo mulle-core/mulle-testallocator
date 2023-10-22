@@ -12,6 +12,34 @@ if( MULLE_TRACE_INCLUDE)
 endif()
 
 #
+# Generated from sourcetree: 5C3405CC-15C5-4602-AC79-FF22891F4ADE;mulle-allocator;no-all-load,no-bequeath,no-cmake-inherit,no-import,no-link,no-singlephase;mulle-core,mulle-allocator
+# Disable with : `mulle-sourcetree mark mulle-allocator no-header`
+# Disable for this platform: `mulle-sourcetree mark mulle-allocator no-cmake-platform-${MULLE_UNAME}`
+# Disable for a sdk: `mulle-sourcetree mark mulle-allocator no-cmake-sdk-<name>`
+#
+if( NOT MULLE_ALLOCATOR_HEADER)
+   find_file( MULLE_ALLOCATOR_HEADER NAMES mulle-allocator.h mulle-core/mulle-core.h mulle-allocator/mulle-allocator.h)
+   message( STATUS "MULLE_ALLOCATOR_HEADER is ${MULLE_ALLOCATOR_HEADER}")
+
+   #
+   # Add MULLE_ALLOCATOR_HEADER to HEADER_ONLY_LIBRARIES list.
+   # Disable with: `mulle-sourcetree mark mulle-allocator no-cmake-add`
+   #
+   set( HEADER_ONLY_LIBRARIES
+      ${MULLE_ALLOCATOR_HEADER}
+      ${HEADER_ONLY_LIBRARIES}
+   )
+   if( MULLE_ALLOCATOR_HEADER)
+      # intentionally left blank
+   else()
+      # Disable with: `mulle-sourcetree mark mulle-allocator no-require`
+      message( FATAL_ERROR "MULLE_ALLOCATOR_HEADER was not found")
+   endif()
+endif()
+
+
+
+#
 # Generated from sourcetree: 557D6E11-900A-499A-BCF2-23D58BA04C5D;mulle-thread;no-all-load,no-cmake-searchpath,no-import,no-singlephase;mulle-core,mulle-thread
 # Disable with : `mulle-sourcetree mark mulle-thread no-link`
 # Disable for this platform: `mulle-sourcetree mark mulle-thread no-cmake-platform-${MULLE_UNAME}`
@@ -90,51 +118,6 @@ if( NOT MULLE_THREAD_LIBRARY)
    else()
       # Disable with: `mulle-sourcetree mark mulle-thread no-require-link`
       message( FATAL_ERROR "MULLE_THREAD_LIBRARY was not found")
-   endif()
-endif()
-
-
-#
-# Generated from sourcetree: 5C3405CC-15C5-4602-AC79-FF22891F4ADE;mulle-allocator;no-all-load,no-cmake-inherit,no-import,no-singlephase;mulle-core,mulle-allocator
-# Disable with : `mulle-sourcetree mark mulle-allocator no-link`
-# Disable for this platform: `mulle-sourcetree mark mulle-allocator no-cmake-platform-${MULLE_UNAME}`
-# Disable for a sdk: `mulle-sourcetree mark mulle-allocator no-cmake-sdk-<name>`
-#
-if( NOT MULLE_ALLOCATOR_LIBRARY)
-   find_library( MULLE_ALLOCATOR_LIBRARY NAMES
-      ${CMAKE_STATIC_LIBRARY_PREFIX}mulle-core${CMAKE_DEBUG_POSTFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}
-      ${CMAKE_STATIC_LIBRARY_PREFIX}mulle-core${CMAKE_STATIC_LIBRARY_SUFFIX}
-      mulle-core
-      ${CMAKE_STATIC_LIBRARY_PREFIX}mulle-allocator${CMAKE_DEBUG_POSTFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}
-      ${CMAKE_STATIC_LIBRARY_PREFIX}mulle-allocator${CMAKE_STATIC_LIBRARY_SUFFIX}
-      mulle-allocator
-      NO_CMAKE_SYSTEM_PATH NO_SYSTEM_ENVIRONMENT_PATH
-   )
-   if( NOT MULLE_ALLOCATOR_LIBRARY AND NOT DEPENDENCY_IGNORE_SYSTEM_LIBARIES)
-      find_library( MULLE_ALLOCATOR_LIBRARY NAMES
-         ${CMAKE_STATIC_LIBRARY_PREFIX}mulle-core${CMAKE_DEBUG_POSTFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}
-         ${CMAKE_STATIC_LIBRARY_PREFIX}mulle-core${CMAKE_STATIC_LIBRARY_SUFFIX}
-         mulle-core
-         ${CMAKE_STATIC_LIBRARY_PREFIX}mulle-allocator${CMAKE_DEBUG_POSTFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}
-         ${CMAKE_STATIC_LIBRARY_PREFIX}mulle-allocator${CMAKE_STATIC_LIBRARY_SUFFIX}
-         mulle-allocator
-      )
-   endif()
-   message( STATUS "MULLE_ALLOCATOR_LIBRARY is ${MULLE_ALLOCATOR_LIBRARY}")
-   #
-   # The order looks ascending, but due to the way this file is read
-   # it ends up being descending, which is what we need.
-   #
-   if( MULLE_ALLOCATOR_LIBRARY)
-      #
-      # Add MULLE_ALLOCATOR_LIBRARY to DEPENDENCY_LIBRARIES list.
-      # Disable with: `mulle-sourcetree mark mulle-allocator no-cmake-add`
-      #
-      list( APPEND DEPENDENCY_LIBRARIES ${MULLE_ALLOCATOR_LIBRARY})
-      # intentionally left blank
-   else()
-      # Disable with: `mulle-sourcetree mark mulle-allocator no-require-link`
-      message( FATAL_ERROR "MULLE_ALLOCATOR_LIBRARY was not found")
    endif()
 endif()
 
