@@ -62,7 +62,7 @@ enum
    mulle_testallocator_trace_disabled   = -1,
    mulle_testallocator_trace_none       = 0,
    mulle_testallocator_trace_enabled    = 1,
-   mulle_testallocator_trace_verbose    = 2,
+   mulle_testallocator_trace_block      = 2,
    mulle_testallocator_trace_stacktrace = 4
 };
 
@@ -239,7 +239,7 @@ static void  *test_realloc( void *q, size_t size, struct mulle_allocator *unused
       }
    }
 
-   if( local.trace & mulle_testallocator_trace_verbose)
+   if( local.trace & mulle_testallocator_trace_block)
    {
       if( q) // analyzer, just a print of the old address
          log_stacktrace( "realloced %p -> %p-%p",
@@ -281,7 +281,7 @@ static void  *test_calloc( size_t n, size_t size, struct mulle_allocator *unused
       mulle_thread_mutex_unlock( &local.alloc_lock);
    }
 
-   if( local.trace & mulle_testallocator_trace_verbose)
+   if( local.trace & mulle_testallocator_trace_block)
    {
       log_stacktrace( "alloced %p-%p",
                p, &((char *) p)[ n * size ? n * size - 1 : 0]);
@@ -331,7 +331,7 @@ static void  test_free( void *p, struct mulle_allocator *unused)
    if( ! mulle_testallocator_config.dont_free)
       free( p);
 
-   if( local.trace & mulle_testallocator_trace_verbose)
+   if( local.trace & mulle_testallocator_trace_block)
    {
       log_stacktrace( "freed %p", p);  // analyzer: just an address print
    }
@@ -346,7 +346,7 @@ struct mulle_allocator   mulle_testallocator =
    test_realloc,
    test_free,
    mulle_allocation_fail,
-   (mulle_allocator_aba_t) abort
+   (mulle_allocator_aba_t *) abort
 };
 
 
@@ -389,7 +389,7 @@ static long   getenv_long( char *name)
 void   mulle_testallocator_set_tracelevel( unsigned int value)
 {
    if( (int) value != local.trace && (local.trace != mulle_testallocator_trace_disabled || (int) value > 0))
-      fprintf( stderr, "mulle_testallocator: trace level set to %d\n", value);
+      fprintf( stderr, "mulle_testallocator: trace level set to %u\n", value);
 
    local.trace = value;
 }
@@ -506,44 +506,50 @@ static void   _mulle_testallocator_initialize( void *unused)
 
    _mulle_stacktrace_init_default( &local.stacktrace);
 
-   if( getenv_yes_no( "MULLE_TESTALLOCATOR"))
+   if( ! getenv_yes_no( "MULLE_TESTALLOCATOR"))
    {
-      /* Now it gets tricky. In a dylib situation we are not linked with
-         mulle_atexit. mulle_atexit will be statically linked to the exe,
-         and this will be resolved at link time. So thats fine. If
-         mulle_testallocator is added with DYLD_INSERT_LIBRARY this will also
-         work (AFAIK). But if you want to run the debugger within such
-         a DYLD_INSERT_LIBRARY environment, this will fail, since the debugger
-         itself is also getting the insertion and it is usually NOT linked
-         with mulle_atexit. For this we lazy link mulle_atexit and just don't
-         do the codepath if mulle_atexit is not available.
-      */
-      void  (*p_mulle_atexit)( void (*)(void));
-
-      p_mulle_atexit = dlsym( MULLE_RTLD_DEFAULT, "mulle_atexit");
-      if( ! p_mulle_atexit)
-      {
-         trace_log( "not enabled as mulle_atexit was not found");
-         return;
-      }
-
-      trace_log_pointer( "start:     mulle_testallocator_initialize", &mulle_testallocator_initialize);
-      trace_log_pointer( "allocator: mulle_default_allocator", &mulle_default_allocator);
-      trace_log_pointer( "stdlib:    mulle_stdlib_allocator", &mulle_stdlib_allocator);
-
-      // keep old aba, and fail function pointers
-      // scribbling over aba_free would be disastrous
-      mulle_default_allocator.calloc  = test_calloc;
-      mulle_default_allocator.realloc = test_realloc;
-      mulle_default_allocator.free    = test_free;
-
-      trace_log_pointer( "install atexit \"mulle_testallocator_exit\"", (void *) mulle_testallocator_exit);
-
-      (*p_mulle_atexit)( mulle_testallocator_exit);
-
-      if( mulle_testallocator_config.dont_free)
-         trace_log( "memory will not really be freed");
+      // if any kind of tracelevel has been set, notify that this is not enough
+      if( local.trace > 0)
+         fprintf( stderr, "mulle_testallocator: %s\n", 
+                          "not enabled as MULLE_TESTALLOCATOR is not set to YES");
+      return;
    }
+
+   /* Now it gets tricky. In a dylib situation we are not linked with
+      mulle_atexit. mulle_atexit will be statically linked to the exe,
+      and this will be resolved at link time. So thats fine. If
+      mulle_testallocator is added with DYLD_INSERT_LIBRARY this will also
+      work (AFAIK). But if you want to run the debugger within such
+      a DYLD_INSERT_LIBRARY environment, this will fail, since the debugger
+      itself is also getting the insertion and it is usually NOT linked
+      with mulle_atexit. For this we lazy link mulle_atexit and just don't
+      do the codepath if mulle_atexit is not available.
+   */
+   void  (*p_mulle_atexit)( void (*)(void));
+
+   p_mulle_atexit = dlsym( MULLE_RTLD_DEFAULT, "mulle_atexit");
+   if( ! p_mulle_atexit)
+   {
+      trace_log( "not enabled as mulle_atexit was not found");
+      return;
+   }
+
+   trace_log_pointer( "start:     mulle_testallocator_initialize", &mulle_testallocator_initialize);
+   trace_log_pointer( "allocator: mulle_default_allocator", &mulle_default_allocator);
+   trace_log_pointer( "stdlib:    mulle_stdlib_allocator", &mulle_stdlib_allocator);
+
+   // keep old aba, and fail function pointers
+   // scribbling over aba_free would be disastrous
+   mulle_default_allocator.calloc  = test_calloc;
+   mulle_default_allocator.realloc = test_realloc;
+   mulle_default_allocator.free    = test_free;
+
+   trace_log_pointer( "install atexit \"mulle_testallocator_exit\"", (void *) mulle_testallocator_exit);
+
+   (*p_mulle_atexit)( mulle_testallocator_exit);
+
+   if( mulle_testallocator_config.dont_free)
+      trace_log( "memory will not really be freed");
 }
 
 
