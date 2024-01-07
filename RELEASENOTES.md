@@ -1,3 +1,8 @@
+### 5.0.2
+
+* tried to make output a bit more scrutable in case `MULLE_TESTALLOCATOR` is seemingly unused
+* mulle-allocator is now a private dependency, for the benefit of not shadowing it in  mulle-core on macOS
+
 ### 5.0.1
 
 * remove package.json as it conflicts with clib.json
