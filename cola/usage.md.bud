@@ -35,8 +35,7 @@ mulle-testallocator will tell you your leaks when the executable exits.
 >
 > The order of constructor and atexit calls is dependent on the link order.
 > To catch all leaks, it is advantageous to link mulle-testallocator ahead of
-> all other code. You should also use [whole archive linking](//stackoverflow.com/questions/25038974/force-load-linker-flag-for-other-platforms) as otherwise the
-> library may just be omitted from the link.
+> all other code. 
 
 
 #### Manual method

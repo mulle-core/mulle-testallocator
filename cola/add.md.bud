@@ -1,5 +1,8 @@
 ## Add
 
+You should use [whole archive linking](//stackoverflow.com/questions/25038974/force-load-linker-flag-for-other-platforms) as otherwise the library may just 
+be omitted from the link. (The mulle-sde mark `all-load` will do this for you).
+
 
 ### Add as an individual component
 
