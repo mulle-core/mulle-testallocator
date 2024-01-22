@@ -22,7 +22,7 @@
 
 #if defined( MULLE__ATINIT_VERSION)
 # ifndef MULLE__ATINIT_VERSION_MIN
-#  define MULLE__ATINIT_VERSION_MIN  ((0UL << 20) | (0 << 8) | 11)
+#  define MULLE__ATINIT_VERSION_MIN  ((0UL << 20) | (0 << 8) | 12)
 # endif
 # ifndef MULLE__ATINIT_VERSION_MAX
 #  define MULLE__ATINIT_VERSION_MAX  ((0UL << 20) | (1 << 8) | 0)
@@ -67,7 +67,7 @@
 
 #if defined( MULLE__THREAD_VERSION)
 # ifndef MULLE__THREAD_VERSION_MIN
-#  define MULLE__THREAD_VERSION_MIN  ((4UL << 20) | (5 << 8) | 2)
+#  define MULLE__THREAD_VERSION_MIN  ((4UL << 20) | (5 << 8) | 3)
 # endif
 # ifndef MULLE__THREAD_VERSION_MAX
 #  define MULLE__THREAD_VERSION_MAX  ((5UL << 20) | (0 << 8) | 0)
