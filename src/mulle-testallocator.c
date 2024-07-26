@@ -342,11 +342,11 @@ static void  test_free( void *p, struct mulle_allocator *unused)
 
 struct mulle_allocator   mulle_testallocator =
 {
-   test_calloc,
-   test_realloc,
-   test_free,
-   mulle_allocation_fail,
-   (mulle_allocator_aba_t *) abort
+   .calloc  = test_calloc,
+   .realloc = test_realloc,
+   .free    = test_free,
+   .fail    = mulle_allocation_fail,
+   .abafree = (mulle_allocator_aba_t *) abort
 };
 
 
@@ -489,6 +489,8 @@ static void   mulle_testallocator_exit()
 static void   _mulle_testallocator_initialize( void *unused)
 {
    int    rval;
+   int    tracelevel;
+   int    tracelevel_override;
 
    if( local.trace != mulle_testallocator_trace_disabled)
       return;
@@ -500,20 +502,22 @@ static void   _mulle_testallocator_initialize( void *unused)
       abort();
    }
 
-   mulle_testallocator_set_tracelevel( (int) getenv_long( "MULLE_TESTALLOCATOR_TRACE"));
+   // this way we can just set MULLE_TESTALLOCATOR to a number, and
+   // MULLE_TESTALLOCATOR_TRACE=<no> and MULLE_TESTALLOCATOR='YES' is the
+   // legacy way...
+   tracelevel          = (int) getenv_long( "MULLE_TESTALLOCATOR");
+   tracelevel_override = (int) getenv_long( "MULLE_TESTALLOCATOR_TRACE");
+   if( ! tracelevel_override)
+      tracelevel_override = tracelevel;
+
+   mulle_testallocator_set_tracelevel( tracelevel_override);
    mulle_testallocator_set_max_size( getenv_long( "MULLE_TESTALLOCATOR_MAX_SIZE"));
    mulle_testallocator_config.dont_free = getenv_yes_no( "MULLE_TESTALLOCATOR_DONT_FREE");
 
    _mulle_stacktrace_init_default( &local.stacktrace);
 
-   if( ! getenv_yes_no( "MULLE_TESTALLOCATOR"))
-   {
-      // if any kind of tracelevel has been set, notify that this is not enough
-      if( local.trace > 0)
-         fprintf( stderr, "mulle_testallocator: %s\n", 
-                          "not enabled as MULLE_TESTALLOCATOR is not set to YES");
+   if( ! local.trace && ! getenv_yes_no( "MULLE_TESTALLOCATOR"))
       return;
-   }
 
    /* Now it gets tricky. In a dylib situation we are not linked with
       mulle_atexit. mulle_atexit will be statically linked to the exe,
