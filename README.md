@@ -13,11 +13,17 @@ mulle-testallocator is a leak and double free checker for tests
 | ![Mulle kybernetiK tag](https://img.shields.io/github/tag/mulle-core/mulle-testallocator.svg?branch=release) [![Build Status](https://github.com/mulle-core/mulle-testallocator/workflows/CI/badge.svg?branch=release)](//github.com/mulle-core/mulle-testallocator/actions) | [RELEASENOTES](RELEASENOTES.md) |
 
 
-## API
+## Environment Variables
 
-You can configure trace output and other properties of the
-[Test Allocator](dox/API_TESTALLOCATOR.md) via the API or environment
-variables.
+Debug support can be turned on and off with environment variables.
+
+| Variable                         | Description
+|--------------------------------- | ------------------------------------
+| `MULLE_TESTALLOCATOR`            | Turn on automatic tracing during startup. (See below)
+| `MULLE_TESTALLOCATOR_TRACE`      | Trace setup, allocations and deallocations. <UL> <LI>1: trace setup and exit.</LI><LI>2: additionally traces allocations.</LI><LI>3: adds a stacktrace to the output (on participating platforms).</LI></UL> A value larger than 3 increases the verbosity of the stacktrace. This implicitly also enables MULLE_TESTALLOCATOR if set to non-zero
+| `MULLE_TESTALLOCATOR_DONT_FREE`  | Memory is not actually freed, this can be useful, when reuse of memory makes the trace too confusing. Obviously this can burn memory away quickly.
+| `MULLE_TESTALLOCATOR_FIRST_LEAK` | Only report the first leak if set to 1 or YES.
+| `MULLE_TESTALLOCATOR_MAX_SIZE`   | Creates an out of memory condition if more than max size is allocated (in one call)
 
 
 
@@ -89,9 +95,11 @@ wrong pointers.
 > Locate Objective-C leaks easily with
 >
 > ``` sh
-> MULLE_OBJC_PEDANTIC_EXIT=YES MULLE_TESTALLOCATOR=YES \
-> MULLE_OBJC_EPHEMERAL_SINGLETON=YES MULLE_OBJC_TRACE_INSTANCE=YES \
-> MULLE_OBJC_TRACE_METHOD_CALL=YES MULLE_TESTALLOCATOR_TRACE=2 \
+> MULLE_TESTALLOCATOR_TRACE=2 \
+> MULLE_OBJC_PEDANTIC_EXIT=YES  \
+> MULLE_OBJC_EPHEMERAL_SINGLETON=YES \
+> MULLE_OBJC_TRACE_INSTANCE=YES \
+> MULLE_OBJC_TRACE_METHOD_CALL=YES \
 >    ./kitchen/Debug/myexe
 > ```
 >
