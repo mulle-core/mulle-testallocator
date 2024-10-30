@@ -346,7 +346,7 @@ struct mulle_allocator   mulle_testallocator =
    .realloc = test_realloc,
    .free    = test_free,
    .fail    = mulle_allocation_fail,
-   .abafree = (mulle_allocator_aba_t *) abort
+   .abafree = (mulle_allocator_aba_t *)  (void *) abort
 };
 
 

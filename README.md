@@ -25,8 +25,6 @@ Debug support can be turned on and off with environment variables.
 | `MULLE_TESTALLOCATOR_FIRST_LEAK` | Only report the first leak if set to 1 or YES.
 | `MULLE_TESTALLOCATOR_MAX_SIZE`   | Creates an out of memory condition if more than max size is allocated (in one call)
 
-
-
 ## Usage
 
 ###  Use `mulle_testallocator` for leak detection
@@ -148,8 +146,6 @@ Add `-isystem src/mulle-core` to your `CFLAGS` and compile all the sources that 
 
 ## Install
 
-### Install with mulle-sde
-
 Use [mulle-sde](//github.com/mulle-sde) to build and install mulle-testallocator and all dependencies:
 
 ``` sh
@@ -157,7 +153,7 @@ mulle-sde install --prefix /usr/local \
    https://github.com/mulle-core/mulle-testallocator/archive/latest.tar.gz
 ```
 
-### Manual Installation
+### Legacy Installation
 
 Install the requirements:
 
