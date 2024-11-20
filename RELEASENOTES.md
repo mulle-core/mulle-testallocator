@@ -1,3 +1,9 @@
+## 5.1.0
+
+
+* you can now just set `MULLE_TESTALLOCATOR_TRACE` and to enable mulle-testallocator
+
+
 ### 5.0.2
 
 * tried to make output a bit more scrutable in case `MULLE_TESTALLOCATOR` is seemingly unused
