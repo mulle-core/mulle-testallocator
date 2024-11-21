@@ -10,7 +10,7 @@ mulle-testallocator is a leak and double free checker for tests
 
 | Release Version                                       | Release Notes
 |-------------------------------------------------------|--------------
-| ![Mulle kybernetiK tag](https://img.shields.io/github/tag/mulle-core/mulle-testallocator.svg?branch=release) [![Build Status](https://github.com/mulle-core/mulle-testallocator/workflows/CI/badge.svg?branch=release)](//github.com/mulle-core/mulle-testallocator/actions) | [RELEASENOTES](RELEASENOTES.md) |
+| ![Mulle kybernetiK tag](https://img.shields.io/github/tag/mulle-core/mulle-testallocator.svg) [![Build Status](https://github.com/mulle-core/mulle-testallocator/workflows/CI/badge.svg)](//github.com/mulle-core/mulle-testallocator/actions) | [RELEASENOTES](RELEASENOTES.md) |
 
 
 ## Environment Variables
