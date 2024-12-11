@@ -1,6 +1,6 @@
 cmake_minimum_required( VERSION 3.14)
 
-project( mulle-testallocator VERSION 5.1.0 LANGUAGES C)
+project( mulle-testallocator VERSION 5.1.1 LANGUAGES C)
 
 
 ### mulle-sde environment

@@ -1,3 +1,7 @@
+### 5.1.1
+
+* adapt to version change in stacktrace
+
 ## 5.1.0
 
 
