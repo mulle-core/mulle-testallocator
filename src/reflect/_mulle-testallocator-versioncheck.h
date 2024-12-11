@@ -52,10 +52,10 @@
 
 #if defined( MULLE__STACKTRACE_VERSION)
 # ifndef MULLE__STACKTRACE_VERSION_MIN
-#  define MULLE__STACKTRACE_VERSION_MIN  ((0UL << 20) | (2 << 8) | 9)
+#  define MULLE__STACKTRACE_VERSION_MIN  ((0UL << 20) | (3 << 8) | 0)
 # endif
 # ifndef MULLE__STACKTRACE_VERSION_MAX
-#  define MULLE__STACKTRACE_VERSION_MAX  ((0UL << 20) | (3 << 8) | 0)
+#  define MULLE__STACKTRACE_VERSION_MAX  ((0UL << 20) | (4 << 8) | 0)
 # endif
 # if MULLE__STACKTRACE_VERSION < MULLE__STACKTRACE_VERSION_MIN
 #  error "mulle-stacktrace is too old"
