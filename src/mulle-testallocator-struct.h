@@ -43,10 +43,16 @@
  */
 struct _mulle_testallocator_config
 {
+   // the "bail" vector, that usually calls exit. you may want to do
+   // something more clever with 'q'. Bail must be first, for ease of
+   // patching by mulle-objc
+   void     (*bail)( void *q);
+
    int      _windows;
    int      out_of_memory;
    size_t   max_size;
    int      dont_free;  // use this to avoid reuse of memory areas
+
 };
 
 #endif

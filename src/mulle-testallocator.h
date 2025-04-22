@@ -41,7 +41,7 @@
 
 #include "mulle-testallocator-struct.h"
 
-#define MULLE__TESTALLOCATOR_VERSION    ((5UL << 20) | (1 << 8) | 1)
+#define MULLE__TESTALLOCATOR_VERSION    ((5UL << 20) | (2 << 8) | 0)
 
 MULLE__TESTALLOCATOR_GLOBAL struct _mulle_testallocator_config   mulle_testallocator_config;
 MULLE__TESTALLOCATOR_GLOBAL struct mulle_allocator               mulle_testallocator;
@@ -94,6 +94,9 @@ void   _mulle_testallocator_reset( void);
 
 MULLE__TESTALLOCATOR_GLOBAL
 void   _mulle_testallocator_detect_leaks( void);
+
+MULLE__TESTALLOCATOR_GLOBAL
+void   mulle_testallocator_bail( void *p);
 
 
 #ifdef __has_include

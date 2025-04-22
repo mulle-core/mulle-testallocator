@@ -86,14 +86,16 @@ static struct
    mulle_testallocator_trace_disabled
 };
 
+
 //
 // unintialized data gets name mangled by cl.exe
 // initialized data fortunately not
 //
-struct _mulle_testallocator_config    mulle_testallocator_config  =
+struct _mulle_testallocator_config   mulle_testallocator_config =
 {
+   .bail = mulle_testallocator_bail,
 #ifdef _WIN32
-   1
+   ._windows = 1,
 #endif
 };
 
@@ -156,13 +158,18 @@ void   mulle_testallocator_bail( void *p)
    abort();
 }
 
+static inline void   bail( void *p)
+{
+   (*mulle_testallocator_config.bail)( p);
+}
+
 
 static void   reused_pointer_assert( void *p)
 {
    if( _pointerset_get( &local.allocations, p))
    {
       log_stacktrace( "\n###\n### a non-allocator-freed block got reused: %p", p);
-      mulle_testallocator_bail( p);
+      bail( p);
    }
 }
 
@@ -192,7 +199,7 @@ static void  *test_realloc( void *q, size_t size, struct mulle_allocator *unused
          if( ! old)
          {
             log_stacktrace( "\n###\n### false realloc: %p", q);
-            mulle_testallocator_bail( q);
+            bail( q);
          }
          mulle_thread_mutex_unlock( &local.alloc_lock);
       }
@@ -313,7 +320,7 @@ static void  test_free( void *p, struct mulle_allocator *unused)
       if( q)
       {
          log_stacktrace( "\n###\n### double free: %p", p);
-         mulle_testallocator_bail( p);
+         bail( p);
       }
       _pointerset_add( &local.frees, p, calloc, free);
 
@@ -321,7 +328,7 @@ static void  test_free( void *p, struct mulle_allocator *unused)
       if( ! q)
       {
          log_stacktrace( "\n###\n### false free: %p", p);
-         mulle_testallocator_bail( p);
+         bail( p);
       }
       _pointerset_remove( &local.allocations, q);
 
@@ -453,7 +460,7 @@ void   _mulle_testallocator_detect_leaks()
    _pointerset_enumerator_done( &rover);
 
    if( first_leak && ! (leakmode & mulle_testallocator_leak_dont_bail))
-      mulle_testallocator_bail( first_leak);
+      bail( first_leak);
 }
 
 
