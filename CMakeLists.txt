@@ -1,6 +1,6 @@
 cmake_minimum_required( VERSION 3.14)
 
-project( mulle-testallocator VERSION 5.1.1 LANGUAGES C)
+project( mulle-testallocator VERSION 5.2.0 LANGUAGES C)
 
 
 ### mulle-sde environment
@@ -13,6 +13,8 @@ list( INSERT CMAKE_MODULE_PATH 0 "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include( Environment)
 
 include( Files)
+
+add_compile_options(-Wno-use-after-free -Wno-int-in-bool-context)
 
 ### Library
 

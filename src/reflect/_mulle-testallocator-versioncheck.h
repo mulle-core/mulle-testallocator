@@ -7,76 +7,92 @@
 
 #if defined( MULLE__ATEXIT_VERSION)
 # ifndef MULLE__ATEXIT_VERSION_MIN
-#  define MULLE__ATEXIT_VERSION_MIN  ((0UL << 20) | (0 << 8) | 15)
+#  define MULLE__ATEXIT_VERSION_MIN  ((0UL << 20) | (0 << 8) | 16)
 # endif
 # ifndef MULLE__ATEXIT_VERSION_MAX
 #  define MULLE__ATEXIT_VERSION_MAX  ((0UL << 20) | (1 << 8) | 0)
 # endif
-# if MULLE__ATEXIT_VERSION < MULLE__ATEXIT_VERSION_MIN
-#  error "mulle-atexit is too old"
-# endif
-# if MULLE__ATEXIT_VERSION >= MULLE__ATEXIT_VERSION_MAX
-#  error "mulle-atexit is too new"
+# if MULLE__ATEXIT_VERSION < MULLE__ATEXIT_VERSION_MIN || MULLE__ATEXIT_VERSION >= MULLE__ATEXIT_VERSION_MAX
+#  pragma message("MULLE__ATEXIT_VERSION     is " MULLE_C_STRINGIFY_MACRO( MULLE__ATEXIT_VERSION))
+#  pragma message("MULLE__ATEXIT_VERSION_MIN is " MULLE_C_STRINGIFY_MACRO( MULLE__ATEXIT_VERSION_MIN))
+#  pragma message("MULLE__ATEXIT_VERSION_MAX is " MULLE_C_STRINGIFY_MACRO( MULLE__ATEXIT_VERSION_MAX))
+#  if MULLE__ATEXIT_VERSION < MULLE__ATEXIT_VERSION_MIN
+#   error "mulle-atexit is too old"
+#  else
+#   error "mulle-atexit is too new"
+#  endif
 # endif
 #endif
-
 #if defined( MULLE__ATINIT_VERSION)
 # ifndef MULLE__ATINIT_VERSION_MIN
-#  define MULLE__ATINIT_VERSION_MIN  ((0UL << 20) | (0 << 8) | 13)
+#  define MULLE__ATINIT_VERSION_MIN  ((0UL << 20) | (0 << 8) | 14)
 # endif
 # ifndef MULLE__ATINIT_VERSION_MAX
 #  define MULLE__ATINIT_VERSION_MAX  ((0UL << 20) | (1 << 8) | 0)
 # endif
-# if MULLE__ATINIT_VERSION < MULLE__ATINIT_VERSION_MIN
-#  error "mulle-atinit is too old"
-# endif
-# if MULLE__ATINIT_VERSION >= MULLE__ATINIT_VERSION_MAX
-#  error "mulle-atinit is too new"
+# if MULLE__ATINIT_VERSION < MULLE__ATINIT_VERSION_MIN || MULLE__ATINIT_VERSION >= MULLE__ATINIT_VERSION_MAX
+#  pragma message("MULLE__ATINIT_VERSION     is " MULLE_C_STRINGIFY_MACRO( MULLE__ATINIT_VERSION))
+#  pragma message("MULLE__ATINIT_VERSION_MIN is " MULLE_C_STRINGIFY_MACRO( MULLE__ATINIT_VERSION_MIN))
+#  pragma message("MULLE__ATINIT_VERSION_MAX is " MULLE_C_STRINGIFY_MACRO( MULLE__ATINIT_VERSION_MAX))
+#  if MULLE__ATINIT_VERSION < MULLE__ATINIT_VERSION_MIN
+#   error "mulle-atinit is too old"
+#  else
+#   error "mulle-atinit is too new"
+#  endif
 # endif
 #endif
-
 #if defined( MULLE__DLFCN_VERSION)
 # ifndef MULLE__DLFCN_VERSION_MIN
-#  define MULLE__DLFCN_VERSION_MIN  ((0UL << 20) | (0 << 8) | 13)
+#  define MULLE__DLFCN_VERSION_MIN  ((0UL << 20) | (0 << 8) | 15)
 # endif
 # ifndef MULLE__DLFCN_VERSION_MAX
 #  define MULLE__DLFCN_VERSION_MAX  ((0UL << 20) | (1 << 8) | 0)
 # endif
-# if MULLE__DLFCN_VERSION < MULLE__DLFCN_VERSION_MIN
-#  error "mulle-dlfcn is too old"
-# endif
-# if MULLE__DLFCN_VERSION >= MULLE__DLFCN_VERSION_MAX
-#  error "mulle-dlfcn is too new"
+# if MULLE__DLFCN_VERSION < MULLE__DLFCN_VERSION_MIN || MULLE__DLFCN_VERSION >= MULLE__DLFCN_VERSION_MAX
+#  pragma message("MULLE__DLFCN_VERSION     is " MULLE_C_STRINGIFY_MACRO( MULLE__DLFCN_VERSION))
+#  pragma message("MULLE__DLFCN_VERSION_MIN is " MULLE_C_STRINGIFY_MACRO( MULLE__DLFCN_VERSION_MIN))
+#  pragma message("MULLE__DLFCN_VERSION_MAX is " MULLE_C_STRINGIFY_MACRO( MULLE__DLFCN_VERSION_MAX))
+#  if MULLE__DLFCN_VERSION < MULLE__DLFCN_VERSION_MIN
+#   error "mulle-dlfcn is too old"
+#  else
+#   error "mulle-dlfcn is too new"
+#  endif
 # endif
 #endif
-
 #if defined( MULLE__STACKTRACE_VERSION)
 # ifndef MULLE__STACKTRACE_VERSION_MIN
-#  define MULLE__STACKTRACE_VERSION_MIN  ((0UL << 20) | (3 << 8) | 0)
+#  define MULLE__STACKTRACE_VERSION_MIN  ((0UL << 20) | (3 << 8) | 2)
 # endif
 # ifndef MULLE__STACKTRACE_VERSION_MAX
 #  define MULLE__STACKTRACE_VERSION_MAX  ((0UL << 20) | (4 << 8) | 0)
 # endif
-# if MULLE__STACKTRACE_VERSION < MULLE__STACKTRACE_VERSION_MIN
-#  error "mulle-stacktrace is too old"
-# endif
-# if MULLE__STACKTRACE_VERSION >= MULLE__STACKTRACE_VERSION_MAX
-#  error "mulle-stacktrace is too new"
+# if MULLE__STACKTRACE_VERSION < MULLE__STACKTRACE_VERSION_MIN || MULLE__STACKTRACE_VERSION >= MULLE__STACKTRACE_VERSION_MAX
+#  pragma message("MULLE__STACKTRACE_VERSION     is " MULLE_C_STRINGIFY_MACRO( MULLE__STACKTRACE_VERSION))
+#  pragma message("MULLE__STACKTRACE_VERSION_MIN is " MULLE_C_STRINGIFY_MACRO( MULLE__STACKTRACE_VERSION_MIN))
+#  pragma message("MULLE__STACKTRACE_VERSION_MAX is " MULLE_C_STRINGIFY_MACRO( MULLE__STACKTRACE_VERSION_MAX))
+#  if MULLE__STACKTRACE_VERSION < MULLE__STACKTRACE_VERSION_MIN
+#   error "mulle-stacktrace is too old"
+#  else
+#   error "mulle-stacktrace is too new"
+#  endif
 # endif
 #endif
-
 #if defined( MULLE__THREAD_VERSION)
 # ifndef MULLE__THREAD_VERSION_MIN
-#  define MULLE__THREAD_VERSION_MIN  ((4UL << 20) | (6 << 8) | 0)
+#  define MULLE__THREAD_VERSION_MIN  ((4UL << 20) | (6 << 8) | 2)
 # endif
 # ifndef MULLE__THREAD_VERSION_MAX
 #  define MULLE__THREAD_VERSION_MAX  ((5UL << 20) | (0 << 8) | 0)
 # endif
-# if MULLE__THREAD_VERSION < MULLE__THREAD_VERSION_MIN
-#  error "mulle-thread is too old"
-# endif
-# if MULLE__THREAD_VERSION >= MULLE__THREAD_VERSION_MAX
-#  error "mulle-thread is too new"
+# if MULLE__THREAD_VERSION < MULLE__THREAD_VERSION_MIN || MULLE__THREAD_VERSION >= MULLE__THREAD_VERSION_MAX
+#  pragma message("MULLE__THREAD_VERSION     is " MULLE_C_STRINGIFY_MACRO( MULLE__THREAD_VERSION))
+#  pragma message("MULLE__THREAD_VERSION_MIN is " MULLE_C_STRINGIFY_MACRO( MULLE__THREAD_VERSION_MIN))
+#  pragma message("MULLE__THREAD_VERSION_MAX is " MULLE_C_STRINGIFY_MACRO( MULLE__THREAD_VERSION_MAX))
+#  if MULLE__THREAD_VERSION < MULLE__THREAD_VERSION_MIN
+#   error "mulle-thread is too old"
+#  else
+#   error "mulle-thread is too new"
+#  endif
 # endif
 #endif
 
