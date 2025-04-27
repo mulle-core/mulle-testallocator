@@ -3,7 +3,7 @@
 //  mulle-container
 //
 //  Created by Nat! on 04.11.15.
-//  Copyright (c) 2015 Nat! - Mulle kybernetiK.
+//  Copyright (c) 2015-2025 Nat! - Mulle kybernetiK.
 //  Copyright (c) 2015 Codeon GmbH.
 //  All rights reserved.
 //
@@ -39,12 +39,13 @@
 #include "mulle-testallocator-struct.h"
 // #include "mulle_testallocator.h"  // don't include for windows
 #include <assert.h>
+#ifdef __GLIBC__
+# include <malloc.h>
+#endif
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
-
-
 //#define DEBUG_INITIALIZE
 
 
@@ -174,16 +175,41 @@ static void   reused_pointer_assert( void *p)
 }
 
 
+
+//
+// MEMO: this doesn't work as well as one would hope, because
+//       The value returned by malloc_usable_size() may be greater than the
+//       requested size of the allocation because of various internal im‐
+//       plementation details. So we can't align our scribble nicely..
+//
+// static inline size_t   _get_allocation_size( void *p)
+// {
+//    // return 0 if we can't determine size, which means we scribble whole block
+// #if defined( __GLIBC__)
+//    return( malloc_usable_size( p));
+// #elif defined( __APPLE__)
+//    return( malloc_size( p));
+// #elif defined( _WIN32)
+//    return( _msize( p));
+// #else
+//    return( 0);
+// #endif
+// }
+
+
 static void  *test_realloc( void *q, size_t size, struct mulle_allocator *unused)
 {
-   void   *p;
-   void   *old;
+   void     *p;
+   void     *old;
+//   size_t   old_size;
 
    if( ! may_alloc( size))
    {
       errno = ENOMEM;
       return( NULL);
    }
+
+//   old_size = 0;
 
    if( q)
    {
@@ -203,12 +229,17 @@ static void  *test_realloc( void *q, size_t size, struct mulle_allocator *unused
          }
          mulle_thread_mutex_unlock( &local.alloc_lock);
       }
+
+//      if( ! mulle_testallocator_config.dont_scribble)
+//         old_size = _get_allocation_size( q);
    }
 
    //
    // dont_free doesn't work here, since we don't know the previous size
    // we cant fake it with a malloc/memcpy combination
    //
+
+
    p = realloc( q, size);
    if( p)
    {
@@ -222,6 +253,12 @@ static void  *test_realloc( void *q, size_t size, struct mulle_allocator *unused
 
          if( ! q)
          {
+            if( ! mulle_testallocator_config.dont_scribble)
+            {
+               // keep upper and lower bit sets of each byte
+               mulle_memset_uint32( p, 0xF3A7F3A7,size);
+            }
+
             // just a normal malloc
             _pointerset_remove( &local.frees, p);
             reused_pointer_assert( p);
@@ -235,13 +272,12 @@ static void  *test_realloc( void *q, size_t size, struct mulle_allocator *unused
                assert( ! _pointerset_get( &local.frees, q));
                assert( _pointerset_get( &local.allocations, q));
                _pointerset_remove( &local.allocations, q); // just a pointer remove
-               _pointerset_add( &local.frees, q, calloc, free);
-
                _pointerset_remove( &local.frees, p);
                reused_pointer_assert( p);
                _pointerset_add( &local.allocations, p, calloc, free);
             }
          }
+
          mulle_thread_mutex_unlock( &local.alloc_lock);
       }
    }
@@ -359,14 +395,8 @@ struct mulle_allocator   mulle_testallocator =
 
 #pragma mark - reset allocator between tests
 
-static int   getenv_yes_no( char *name)
+static int   _is_yes_no( char *s)
 {
-   char   *s;
-
-   s = getenv( name);
-   if( ! s)
-      return( 0);
-
    switch( *s)
    {
    case '\0':
@@ -378,6 +408,18 @@ static int   getenv_yes_no( char *name)
    }
 
    return( 1);
+}
+
+
+static int   getenv_yes_no( char *name)
+{
+   char   *s;
+
+   s = getenv( name);
+   if( ! s)
+      return( 0);
+
+   return( _is_yes_no( s));
 }
 
 
@@ -415,18 +457,6 @@ void   mulle_testallocator_set_stacktracesymbolizer( void (*f)( void))
 {
    assert( f);
    local.stacktrace.symbolize = (mulle_stacktrace_symbolizer_t *) f;
-}
-
-
-void   _mulle_testallocator_reset()
-{
-   _pointerset_done( &local.allocations, free);
-   _pointerset_done( &local.frees, free);
-
-   mulle_testallocator_config.out_of_memory = 0;
-
-   _pointerset_init( &local.allocations);
-   _pointerset_init( &local.frees);
 }
 
 
@@ -481,7 +511,23 @@ static void   trace_log_pointer( char *s, void *pointer)
 //
 // TODO: MULLE_C_CONSTRUCTOR doesn't work with non-clang compilers
 //
-static void   mulle_testallocator_exit()
+void   *mulle_testallocator_stdlib_realloc( void *q, size_t size, struct mulle_allocator *allocator)
+{
+   void     *p;
+//   size_t   old_size;
+
+   if( q || mulle_testallocator_config.dont_scribble)
+      return( realloc( q, size));
+
+//   old_size = q ? _get_allocation_size( q) : 0;
+   p = realloc( q, size);
+   if( p)
+      mulle_memset_uint32( p, 0xCAF3CAF3, size);
+   return( p);
+}
+
+
+void   mulle_testallocator_exit()
 {
    if( local.trace == mulle_testallocator_trace_disabled)
       return;
@@ -497,33 +543,35 @@ static void   _mulle_testallocator_initialize( void *unused)
 {
    int    rval;
    int    tracelevel;
-   int    tracelevel_override;
+   char   *s;
 
+   // only run this once
    if( local.trace != mulle_testallocator_trace_disabled)
       return;
-
-   rval = mulle_thread_mutex_init( &local.alloc_lock);
-   if( rval)
-   {
-      fprintf( stderr, "_mulle_testallocator_initialize could not get a mutex\n");
-      abort();
-   }
 
    // this way we can just set MULLE_TESTALLOCATOR to a number, and
    // MULLE_TESTALLOCATOR_TRACE=<no> and MULLE_TESTALLOCATOR='YES' is the
    // legacy way...
-   tracelevel          = (int) getenv_long( "MULLE_TESTALLOCATOR");
-   tracelevel_override = (int) getenv_long( "MULLE_TESTALLOCATOR_TRACE");
-   if( ! tracelevel_override)
-      tracelevel_override = tracelevel;
+   tracelevel = 0;
 
-   mulle_testallocator_set_tracelevel( tracelevel_override);
+   s = getenv( "MULLE_TESTALLOCATOR");
+   if( s)
+   {
+      tracelevel = atol( s);
+      if( ! tracelevel)
+         tracelevel = _is_yes_no( s);
+   }
+
+   s = getenv( "MULLE_TESTALLOCATOR_TRACE");
+   mulle_testallocator_set_tracelevel( s
+                                       ? atol( s)
+                                       : tracelevel);
    mulle_testallocator_set_max_size( getenv_long( "MULLE_TESTALLOCATOR_MAX_SIZE"));
-   mulle_testallocator_config.dont_free = getenv_yes_no( "MULLE_TESTALLOCATOR_DONT_FREE");
 
-   _mulle_stacktrace_init_default( &local.stacktrace);
+   mulle_testallocator_config.dont_scribble = getenv_yes_no( "MULLE_TESTALLOCATOR_DONT_SCRIBBLE");
+   mulle_testallocator_config.dont_free     = getenv_yes_no( "MULLE_TESTALLOCATOR_DONT_FREE");
 
-   if( ! local.trace && ! getenv_yes_no( "MULLE_TESTALLOCATOR"))
+   if( ! local.trace)
       return;
 
    /* Now it gets tricky. In a dylib situation we are not linked with
@@ -545,15 +593,28 @@ static void   _mulle_testallocator_initialize( void *unused)
       return;
    }
 
-   trace_log_pointer( "start:     mulle_testallocator_initialize", &mulle_testallocator_initialize);
-   trace_log_pointer( "allocator: mulle_default_allocator", &mulle_default_allocator);
-   trace_log_pointer( "stdlib:    mulle_stdlib_allocator", &mulle_stdlib_allocator);
+   rval = mulle_thread_mutex_init( &local.alloc_lock);
+   if( rval)
+   {
+      fprintf( stderr, "_mulle_testallocator_initialize could not get a mutex\n");
+      abort();
+   }
+
+   _mulle_stacktrace_init_default( &local.stacktrace);
+
+   trace_log_pointer( "start:         mulle_testallocator_initialize", &mulle_testallocator_initialize);
+   trace_log_pointer( "allocator:     mulle_default_allocator", &mulle_default_allocator);
+   trace_log_pointer( "stdlib:        mulle_stdlib_allocator", &mulle_stdlib_allocator);
+   trace_log_pointer( "stdlib nofree: mulle_stdlib_nofree_allocator", &mulle_stdlib_nofree_allocator);
 
    // keep old aba, and fail function pointers
    // scribbling over aba_free would be disastrous
    mulle_default_allocator.calloc  = test_calloc;
    mulle_default_allocator.realloc = test_realloc;
    mulle_default_allocator.free    = test_free;
+
+   mulle_stdlib_allocator.realloc        = mulle_testallocator_stdlib_realloc;
+   mulle_stdlib_nofree_allocator.realloc = mulle_testallocator_stdlib_realloc;
 
    trace_log_pointer( "install atexit \"mulle_testallocator_exit\"", (void *) mulle_testallocator_exit);
 
@@ -587,6 +648,19 @@ static void   load( void)
 {
    mulle_testallocator_initialize();
 }
+
+
+void   _mulle_testallocator_reset()
+{
+   _pointerset_done( &local.allocations, free);
+   _pointerset_done( &local.frees, free);
+
+   mulle_testallocator_config.out_of_memory = 0;
+
+   _pointerset_init( &local.allocations);
+   _pointerset_init( &local.frees);
+}
+
 
 
 void   mulle_testallocator_reset_detect_leaks( int detect)
