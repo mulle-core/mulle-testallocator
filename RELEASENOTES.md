@@ -1,3 +1,9 @@
+## 5.2.0
+
+
+* added a bail vector to intercept errors
+
+
 ### 5.1.1
 
 * adapt to version change in stacktrace
