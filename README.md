@@ -8,9 +8,9 @@ mulle-testallocator is a leak and double free checker for tests
 
 
 
-| Release Version                                       | Release Notes
-|-------------------------------------------------------|--------------
-| ![Mulle kybernetiK tag](https://img.shields.io/github/tag/mulle-core/mulle-testallocator.svg) [![Build Status](https://github.com/mulle-core/mulle-testallocator/workflows/CI/badge.svg)](//github.com/mulle-core/mulle-testallocator/actions) | [RELEASENOTES](RELEASENOTES.md) |
+| Release Version                                       | Release Notes  | AI Documentation
+|-------------------------------------------------------|----------------|---------------
+| ![Mulle kybernetiK tag](https://img.shields.io/github/tag/mulle-core/mulle-testallocator.svg) [![Build Status](https://github.com/mulle-core/mulle-testallocator/workflows/CI/badge.svg)](//github.com/mulle-core/mulle-testallocator/actions) | [RELEASENOTES](RELEASENOTES.md) | [DeepWiki for mulle-testallocator](https://deepwiki.com/mulle-core/mulle-testallocator)
 
 
 ## Environment Variables
@@ -161,6 +161,7 @@ Install the requirements:
 |----------------------------------------------|-----------------------
 | [mulle-thread](https://github.com/mulle-concurrent/mulle-thread)             | 🔠 Cross-platform thread/mutex/tss/atomic operations in C
 | [mulle-allocator](https://github.com/mulle-c/mulle-allocator)             | 🔄 Flexible C memory allocation scheme
+| [mulle-data](https://github.com/mulle-c/mulle-data)             | #️⃣ A collection of hash functions
 | [mulle-stacktrace](https://github.com/mulle-core/mulle-stacktrace)             | 👣 Stracktrace support for various OS
 | [mulle-atinit](https://github.com/mulle-core/mulle-atinit)             | 🤱🏼 Compatibility library for deterministic initializers
 | [mulle-atexit](https://github.com/mulle-core/mulle-atexit)             | 👼 Compatibility library to fix atexit

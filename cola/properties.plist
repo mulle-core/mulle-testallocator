@@ -3,6 +3,8 @@
    {
       description="🔄 C memory leak and double free checking";
       domain="github";
+      language="c";
+      dialect="c";
       name="mulle-testallocator";
       user="mulle-core";
       repo="mulle-testallocator";
@@ -25,6 +27,14 @@
          name="mulle-allocator";
          repo="mulle-allocator";
          url="https://github.com/mulle-c/mulle-allocator";
+         user="mulle-c";
+      },
+      {
+         description="#️⃣ A collection of hash functions";
+         domain="github";
+         name="mulle-data";
+         repo="mulle-data";
+         url="https://github.com/mulle-c/mulle-data";
          user="mulle-c";
       },
       {

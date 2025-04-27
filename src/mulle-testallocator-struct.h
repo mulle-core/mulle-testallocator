@@ -49,10 +49,11 @@ struct _mulle_testallocator_config
    void     (*bail)( void *q);
 
    int      _windows;
+   int      patch_stdlib_scribble;  // if set, patches stdlib malloc to scribble memory
    int      out_of_memory;
    size_t   max_size;
    int      dont_free;  // use this to avoid reuse of memory areas
-
+   int      dont_scribble;  // use this to avoid reuse of memory areas
 };
 
 #endif
