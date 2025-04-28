@@ -84,7 +84,7 @@ static struct
    size_t                    max_size;
 } local =
 {
-   mulle_testallocator_trace_disabled
+   .trace = mulle_testallocator_trace_disabled
 };
 
 
