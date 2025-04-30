@@ -166,6 +166,7 @@ static inline void   *_pointerset_enumerator_next( struct _pointerset_enumerator
 
 static inline void  _pointerset_enumerator_done( struct _pointerset_enumerator *rover)
 {
+   MULLE_C_UNUSED( rover);
 }
 
 

@@ -187,6 +187,7 @@ static inline void   *_pointerarray_enumerator_next( struct _pointerarray_enumer
 
 static inline void  _pointerarray_enumerator_done( struct _pointerarray_enumerator *rover)
 {
+   MULLE_C_UNUSED( rover);
 }
 
 #endif
