@@ -603,18 +603,18 @@ static void   _mulle_testallocator_initialize( void *unused)
    _mulle_stacktrace_init_default( &local.stacktrace);
 
    trace_log_pointer( "start:         mulle_testallocator_initialize", &mulle_testallocator_initialize);
-   trace_log_pointer( "allocator:     mulle_default_allocator", &mulle_default_allocator);
-   trace_log_pointer( "stdlib:        mulle_stdlib_allocator", &mulle_stdlib_allocator);
-   trace_log_pointer( "stdlib nofree: mulle_stdlib_nofree_allocator", &mulle_stdlib_nofree_allocator);
+   trace_log_pointer( "allocator:     mulle_allocator_default", &mulle_allocator_default);
+   trace_log_pointer( "stdlib:        mulle_allocator_stdlib", &mulle_allocator_stdlib);
+   trace_log_pointer( "stdlib nofree: mulle_allocator_stdlib_nofree", &mulle_allocator_stdlib_nofree);
 
    // keep old aba, and fail function pointers
    // scribbling over aba_free would be disastrous
-   mulle_default_allocator.calloc  = test_calloc;
-   mulle_default_allocator.realloc = test_realloc;
-   mulle_default_allocator.free    = test_free;
+   mulle_allocator_default.calloc  = test_calloc;
+   mulle_allocator_default.realloc = test_realloc;
+   mulle_allocator_default.free    = test_free;
 
-   mulle_stdlib_allocator.realloc        = mulle_testallocator_stdlib_realloc;
-   mulle_stdlib_nofree_allocator.realloc = mulle_testallocator_stdlib_realloc;
+   mulle_allocator_stdlib.realloc        = mulle_testallocator_stdlib_realloc;
+   mulle_allocator_stdlib_nofree.realloc = mulle_testallocator_stdlib_realloc;
 
    trace_log_pointer( "install atexit \"mulle_testallocator_exit\"", (void *) mulle_testallocator_exit);
 
