@@ -14,49 +14,6 @@
 #ifndef _mulle_testallocator_include_private_h__
 #define _mulle_testallocator_include_private_h__
 
-// To remove the following dependency (headers and library) completely:
-//   `mulle-sde dependency remove mulle-stacktrace`
-// (Use B417A6CC-391E-466E-9516-27D754C8A317 instead of mulle-stacktrace, if there are duplicate entries)
-//
-// You can tweak the following #include with these commands:
-//    remove #include: `mulle-sde dependency mark mulle-stacktrace no-header`
-//    rename              : `mulle-sde dependency|library set mulle-stacktrace include whatever.h`
-//    reorder             : `mulle-sde dependency move mulle-stacktrace <up|down>`
-//    toggle #include: `mulle-sde dependency mark mulle-stacktrace [no-]import`
-//    toggle public       : `mulle-sde dependency mark mulle-stacktrace [no-]public`
-//    toggle optional     : `mulle-sde dependency mark mulle-stacktrace [no-]require`
-//    remove for platform : `mulle-sde dependency mark mulle-stacktrace no-platform-<uname>`
-//        (use `mulle-sourcetree-to-c --unames` to list known values)
-#include <mulle-stacktrace/mulle-stacktrace.h>   // mulle-stacktrace
-
-// To remove the following dependency (headers and library) completely:
-//   `mulle-sde dependency remove mulle-atinit`
-// (Use 1E64BF82-7365-41E3-94CA-3CF148B45533 instead of mulle-atinit, if there are duplicate entries)
-//
-// You can tweak the following #include with these commands:
-//    remove #include: `mulle-sde dependency mark mulle-atinit no-header`
-//    rename              : `mulle-sde dependency|library set mulle-atinit include whatever.h`
-//    reorder             : `mulle-sde dependency move mulle-atinit <up|down>`
-//    toggle #include: `mulle-sde dependency mark mulle-atinit [no-]import`
-//    toggle public       : `mulle-sde dependency mark mulle-atinit [no-]public`
-//    toggle optional     : `mulle-sde dependency mark mulle-atinit [no-]require`
-//    remove for platform : `mulle-sde dependency mark mulle-atinit no-platform-<uname>`
-//        (use `mulle-sourcetree-to-c --unames` to list known values)
-#include <mulle-atinit/mulle-atinit.h>   // mulle-atinit
-
-// To remove the following dependency (headers and library) completely:
-//   `mulle-sde dependency remove mulle-atexit`
-// (Use 8CCFB85A-7AE3-452E-A231-A93918CDD6C8 instead of mulle-atexit, if there are duplicate entries)
-//
-// You can tweak the following #include with these commands:
-//    remove #include: `mulle-sde dependency mark mulle-atexit no-header`
-//    rename              : `mulle-sde dependency|library set mulle-atexit include whatever.h`
-//    reorder             : `mulle-sde dependency move mulle-atexit <up|down>`
-//    toggle #include: `mulle-sde dependency mark mulle-atexit [no-]import`
-//    toggle public       : `mulle-sde dependency mark mulle-atexit [no-]public`
-//    toggle optional     : `mulle-sde dependency mark mulle-atexit [no-]require`
-//    remove for platform : `mulle-sde dependency mark mulle-atexit no-platform-<uname>`
-//        (use `mulle-sourcetree-to-c --unames` to list known values)
-#include <mulle-atexit/mulle-atexit.h>   // mulle-atexit
+/* no headers */
 
 #endif
