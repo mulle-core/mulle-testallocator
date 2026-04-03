@@ -46,7 +46,41 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
-//#define DEBUG_INITIALIZE
+
+
+#ifdef DEBUG
+//# define MULLE_TESTALLOCATOR_DEBUG
+#endif
+
+
+//
+// Took me eight hours to notice that there were stale dlls "helpfully" copied
+// besides the executable for nothing else but voodoo purposes.
+// They obscured the fresh dlls and things just didn't make sense anymore.
+//
+#ifdef MULLE_TESTALLOCATOR_DEBUG
+static void   mulle_testallocator_vfprintf( FILE *fp, char *format, va_list args)
+{
+   static FILE   *tracer;
+
+   if( ! tracer)
+   {
+      tracer = fopen( "mulle_ta_trace.txt", "w+");
+      fprintf( tracer, "----\n");
+   }
+   vfprintf( tracer, format, args); fflush( tracer);
+   vfprintf( fp, format, args);
+}
+
+static void   mulle_testallocator_fprintf( FILE *fp, char *format, ...)
+{
+   va_list   args;
+
+   va_start( args, format);
+   mulle_testallocator_vfprintf( fp, format, args);
+   va_end( args);
+}
+#endif
 
 
 #pragma clang diagnostic ignored "-Wparentheses"
@@ -73,15 +107,17 @@ enum
    mulle_testallocator_leak_dont_bail  = 2,  // don't abort on leaks
 };
 
+static void   _mulle_testallocator_initialize( void *unused);
+
 
 static struct
 {
    int                       trace;
-   struct mulle_stacktrace   stacktrace;
    mulle_thread_mutex_t      alloc_lock;
    struct _pointerset        allocations;
    struct _pointerset        frees;
    size_t                    max_size;
+   struct mulle_stacktrace   stacktrace;
 } local =
 {
    .trace = mulle_testallocator_trace_disabled
@@ -217,7 +253,7 @@ static void  *test_realloc( void *q, size_t size, struct mulle_allocator *unused
       {
          if( mulle_thread_mutex_lock( &local.alloc_lock))
          {
-            perror( "mulle_thread_mutex_lock:");
+            perror( "mulle-test-allocator test_realloc() doing mulle_thread_mutex_lock:");
             abort();
          }
 
@@ -247,7 +283,7 @@ static void  *test_realloc( void *q, size_t size, struct mulle_allocator *unused
       {
          if( mulle_thread_mutex_lock( &local.alloc_lock))
          {
-            perror( "mulle_thread_mutex_lock:");
+            perror( "mulle-test-allocator test_realloc() doing mulle_thread_mutex_lock:");
             abort();
          }
 
@@ -313,7 +349,7 @@ static void  *test_calloc( size_t n, size_t size, struct mulle_allocator *unused
    {
       if( mulle_thread_mutex_lock( &local.alloc_lock))
       {
-         perror( "mulle_thread_mutex_lock:");
+         perror( "mulle-test-allocator test_calloc() doing mulle_thread_mutex_lock:");
          abort();
       }
 
@@ -348,7 +384,7 @@ static void  test_free( void *p, struct mulle_allocator *unused)
    {
       if( mulle_thread_mutex_lock( &local.alloc_lock))
       {
-         perror( "mulle_thread_mutex_lock:");
+         perror( "mulle-test-allocator test_free() doing mulle_thread_mutex_lock:");
          abort();
       }
 
@@ -440,6 +476,7 @@ void   mulle_testallocator_set_tracelevel( unsigned int value)
    if( (int) value != local.trace && (local.trace != mulle_testallocator_trace_disabled || (int) value > 0))
       fprintf( stderr, "mulle_testallocator: trace level set to %u\n", value);
 
+   assert( value != mulle_testallocator_trace_disabled);
    local.trace = value;
 }
 
@@ -511,7 +548,9 @@ static void   trace_log_pointer( char *s, void *pointer)
 //
 // TODO: MULLE_C_CONSTRUCTOR doesn't work with non-clang compilers
 //
-void   *mulle_testallocator_stdlib_realloc( void *q, size_t size, struct mulle_allocator *allocator)
+void   *mulle_testallocator_stdlib_realloc( void *q,
+                                            size_t size,
+                                            struct mulle_allocator *allocator)
 {
    void     *p;
 //   size_t   old_size;
@@ -527,6 +566,13 @@ void   *mulle_testallocator_stdlib_realloc( void *q, size_t size, struct mulle_a
 }
 
 
+void   mulle_testallocator_cancel( void)
+{
+   mulle_testallocator_discard();
+   mulle_testallocator_set_tracelevel( mulle_testallocator_trace_cancelled);
+}
+
+
 void   mulle_testallocator_exit()
 {
    if( local.trace == mulle_testallocator_trace_disabled)
@@ -539,135 +585,35 @@ void   mulle_testallocator_exit()
 }
 
 
-static void   _mulle_testallocator_initialize( void *unused)
-{
-   int    rval;
-   int    tracelevel;
-   char   *s;
-
-   // only run this once
-   if( local.trace != mulle_testallocator_trace_disabled)
-      return;
-
-   // this way we can just set MULLE_TESTALLOCATOR to a number, and
-   // MULLE_TESTALLOCATOR_TRACE=<no> and MULLE_TESTALLOCATOR='YES' is the
-   // legacy way...
-   tracelevel = 0;
-
-   s = getenv( "MULLE_TESTALLOCATOR");
-   if( s)
-   {
-      tracelevel = atol( s);
-      if( ! tracelevel)
-         tracelevel = _is_yes_no( s);
-   }
-
-   s = getenv( "MULLE_TESTALLOCATOR_TRACE");
-   mulle_testallocator_set_tracelevel( s
-                                       ? atol( s)
-                                       : tracelevel);
-   mulle_testallocator_set_max_size( getenv_long( "MULLE_TESTALLOCATOR_MAX_SIZE"));
-
-   mulle_testallocator_config.dont_scribble = getenv_yes_no( "MULLE_TESTALLOCATOR_DONT_SCRIBBLE");
-   mulle_testallocator_config.dont_free     = getenv_yes_no( "MULLE_TESTALLOCATOR_DONT_FREE");
-
-   if( ! local.trace)
-      return;
-
-   /* Now it gets tricky. In a dylib situation we are not linked with
-      mulle_atexit. mulle_atexit will be statically linked to the exe,
-      and this will be resolved at link time. So thats fine. If
-      mulle_testallocator is added with DYLD_INSERT_LIBRARY this will also
-      work (AFAIK). But if you want to run the debugger within such
-      a DYLD_INSERT_LIBRARY environment, this will fail, since the debugger
-      itself is also getting the insertion and it is usually NOT linked
-      with mulle_atexit. For this we lazy link mulle_atexit and just don't
-      do the codepath if mulle_atexit is not available.
-   */
-   void  (*p_mulle_atexit)( void (*)(void));
-
-   p_mulle_atexit = dlsym( MULLE_RTLD_DEFAULT, "mulle_atexit");
-   if( ! p_mulle_atexit)
-   {
-      trace_log( "not enabled as mulle_atexit was not found");
-      return;
-   }
-
-   rval = mulle_thread_mutex_init( &local.alloc_lock);
-   if( rval)
-   {
-      fprintf( stderr, "_mulle_testallocator_initialize could not get a mutex\n");
-      abort();
-   }
-
-   _mulle_stacktrace_init_default( &local.stacktrace);
-
-   trace_log_pointer( "start:         mulle_testallocator_initialize", &mulle_testallocator_initialize);
-   trace_log_pointer( "allocator:     mulle_allocator_default", &mulle_allocator_default);
-   trace_log_pointer( "stdlib:        mulle_allocator_stdlib", &mulle_allocator_stdlib);
-   trace_log_pointer( "stdlib nofree: mulle_allocator_stdlib_nofree", &mulle_allocator_stdlib_nofree);
-
-   // keep old aba, and fail function pointers
-   // scribbling over aba_free would be disastrous
-   mulle_allocator_default.calloc  = test_calloc;
-   mulle_allocator_default.realloc = test_realloc;
-   mulle_allocator_default.free    = test_free;
-
-   mulle_allocator_stdlib.realloc        = mulle_testallocator_stdlib_realloc;
-   mulle_allocator_stdlib_nofree.realloc = mulle_testallocator_stdlib_realloc;
-
-   trace_log_pointer( "install atexit \"mulle_testallocator_exit\"", (void *) mulle_testallocator_exit);
-
-   (*p_mulle_atexit)( mulle_testallocator_exit);
-
-   if( mulle_testallocator_config.dont_free)
-      trace_log( "memory will not really be freed");
-}
-
-
-// fun fact, in a windows a comstructor is automatically 
-// hidden
-void   mulle_testallocator_initialize( void)
-{
-//#ifdef __APPLE__
-//   // on APPLE we don't need mulle_atinit, it doesn't work right to delay
-//   // this why ??
-//   _mulle_testallocator_initialize( NULL);
-//#else
-# ifdef DEBUG_INITIALIZE
-   fprintf( stderr, "mulle_testallocator_initialize: mulle_atinit set for _mulle_testallocator_initialize\n");
-# endif
-   // 1 meeelion priority!
-   mulle_atinit( _mulle_testallocator_initialize, NULL, 1000000, "mulle_testallocator");
-//#endif
-}
-
-
-MULLE_C_CONSTRUCTOR( load)
-static void   load( void)
-{
-   mulle_testallocator_initialize();
-}
-
-
 void   _mulle_testallocator_reset()
 {
+#ifdef MULLE_TESTALLOCATOR_DEBUG
+   mulle_testallocator_fprintf( stderr, "%s: removing allocations and frees\n", __FUNCTION__);
+#endif
    _pointerset_done( &local.allocations, free);
    _pointerset_done( &local.frees, free);
 
    mulle_testallocator_config.out_of_memory = 0;
 
+#ifdef MULLE_TESTALLOCATOR_DEBUG
+   mulle_testallocator_fprintf( stderr, "%s: initializing allocations and frees\n", __FUNCTION__);
+#endif
    _pointerset_init( &local.allocations);
    _pointerset_init( &local.frees);
-}
 
+#ifdef MULLE_TESTALLOCATOR_DEBUG
+   mulle_testallocator_fprintf( stderr, "%s: finished\n", __FUNCTION__);
+#endif
+}
 
 
 void   mulle_testallocator_reset_detect_leaks( int detect)
 {
-   if( local.trace == mulle_testallocator_trace_disabled)
-      mulle_testallocator_initialize();   // for windows, tests can get by calling
-                                          // mulle_testallocator_reset first
+#ifdef MULLE_TESTALLOCATOR_DEBUG
+   mulle_testallocator_fprintf( stderr, "%s: removing mulle_testallocator_reset_detect_leaks %d\n", __FUNCTION__, detect);
+#endif
+   _mulle_testallocator_initialize( NULL);   // for windows, tests can get by calling
+                                             // mulle_testallocator_reset first
    trace_log( "lock");
    if( mulle_thread_mutex_lock( &local.alloc_lock))
    {
@@ -686,9 +632,151 @@ void   mulle_testallocator_reset_detect_leaks( int detect)
 }
 
 
-void   mulle_testallocator_cancel( void)
+static void   _mulle_testallocator_initialize( void *unused)
 {
-   mulle_testallocator_discard();
-   mulle_testallocator_set_tracelevel( mulle_testallocator_trace_cancelled);
+   int    rval;
+   int    tracelevel;
+   char   *s;
+
+   MULLE_C_UNUSED( unused);
+
+#ifdef MULLE_TESTALLOCATOR_DEBUG
+   mulle_testallocator_fprintf( stderr, "_mulle_testallocator_initialize starts\n");
+#endif
+
+   mulle_thread_once_do( once)
+   {
+#ifdef MULLE_TESTALLOCATOR_DEBUG
+      mulle_testallocator_fprintf( stderr, "_mulle_testallocator_initialize inside once\n");
+#endif
+      rval = mulle_thread_mutex_init( &local.alloc_lock);
+      if( rval)
+      {
+         fprintf( stderr, "_mulle_testallocator_initialize could not get a mutex\n");
+         abort();
+      }
+
+      // this way we can just set MULLE_TESTALLOCATOR to a number, and
+      // MULLE_TESTALLOCATOR_TRACE=<no> and MULLE_TESTALLOCATOR='YES' is the
+      // legacy way...
+#ifdef MULLE_TESTALLOCATOR_DEBUG
+      tracelevel = mulle_testallocator_trace_enabled;
+#else
+      tracelevel = (local.trace != mulle_testallocator_trace_disabled) ? local.trace : 0;
+#endif
+      s = getenv( "MULLE_TESTALLOCATOR");
+      if( s)
+      {
+         tracelevel = atol( s);
+         if( ! tracelevel)
+            tracelevel = _is_yes_no( s);
+      }
+
+      s = getenv( "MULLE_TESTALLOCATOR_TRACE");
+      mulle_testallocator_set_tracelevel( s
+                                          ? atol( s)
+                                          : tracelevel);
+      mulle_testallocator_set_max_size( getenv_long( "MULLE_TESTALLOCATOR_MAX_SIZE"));
+
+      mulle_testallocator_config.dont_scribble = getenv_yes_no( "MULLE_TESTALLOCATOR_DONT_SCRIBBLE");
+      mulle_testallocator_config.dont_free     = getenv_yes_no( "MULLE_TESTALLOCATOR_DONT_FREE");
+
+      if( ! local.trace)
+         break;
+
+      /* Now it gets tricky. In a dylib situation we are not linked with
+         _mulle_atexit. _mulle_atexit will be statically linked to the exe,
+         and this will be resolved at link time. So thats fine. If
+         mulle_testallocator is added with DYLD_INSERT_LIBRARY this will also
+         work (AFAIK). But if you want to run the debugger within such
+         a DYLD_INSERT_LIBRARY environment, this will fail, since the debugger
+         itself is also getting the insertion and it is usually NOT linked
+         with _mulle_atexit. For this we lazy link _mulle_atexit and just don't
+         do the codepath if _mulle_atexit is not available.
+      */
+      void  (*p_mulle_atexit)( void (*)(void));
+
+      p_mulle_atexit = mulle_dlsym_exe( "_mulle_atexit");
+      if( ! p_mulle_atexit)
+      {
+         trace_log( "not enabled as mulle_atexit was not found");
+         break;
+      }
+
+      _mulle_stacktrace_init_default( &local.stacktrace);
+
+      trace_log_pointer( "start:         mulle_testallocator_initialize", &mulle_testallocator_initialize);
+      trace_log_pointer( "allocator:     mulle_allocator_default", &mulle_allocator_default);
+      trace_log_pointer( "stdlib:        mulle_allocator_stdlib", &mulle_allocator_stdlib);
+      trace_log_pointer( "stdlib nofree: mulle_allocator_stdlib_nofree", &mulle_allocator_stdlib_nofree);
+
+      // keep old aba, and fail function pointers
+      // scribbling over aba_free would be disastrous
+      // MEMO: If we are dynamically linked then mulle_allocator is also
+      //       dynamic within mulle-core. If we are static we have no problems
+      //       anway. Mixed mode though is not gonna happen.
+      mulle_allocator_default.calloc        = test_calloc;
+      mulle_allocator_default.realloc       = test_realloc;
+      mulle_allocator_default.free          = test_free;
+
+      mulle_allocator_stdlib.realloc        = mulle_testallocator_stdlib_realloc;
+      mulle_allocator_stdlib_nofree.realloc = mulle_testallocator_stdlib_realloc;
+
+      trace_log_pointer( "install atexit \"mulle_testallocator_exit\"", (void *) mulle_testallocator_exit);
+
+      (*p_mulle_atexit)( mulle_testallocator_exit);
+
+      if( mulle_testallocator_config.dont_free)
+         trace_log( "memory will not really be freed");
+   }
 }
 
+
+// fun fact, in a windows a constructor is automatically
+// hidden
+void   mulle_testallocator_initialize( void)
+{
+#ifdef MULLE_TESTALLOCATOR_DEBUG
+   mulle_testallocator_fprintf( stderr, "mulle_testallocator_initialize: init alloc_lock\n");
+#endif
+//#ifdef __APPLE__
+//   // on APPLE we don't need mulle_atinit, it doesn't work right to delay
+//   // this why ??
+//   _mulle_testallocator_initialize( NULL);
+//#else
+#ifdef MULLE_TESTALLOCATOR_DEBUG
+   mulle_testallocator_fprintf( stderr, "mulle_testallocator_initialize: mulle_atinit call for _mulle_testallocator_initialize (%p)\n",
+               (void *) _mulle_testallocator_initialize);
+#endif
+   // 1 meeelion priority!
+   mulle_atinit( _mulle_testallocator_initialize, NULL, 1000000, "**mulle_testallocator**");
+//#endif
+#ifdef MULLE_TESTALLOCATOR_DEBUG
+   mulle_testallocator_fprintf( stderr, "mulle_testallocator_initialize: finished\n");
+#endif
+}
+
+
+// i have NO idea why this doesn't seem to run reliably
+MULLE_C_CONSTRUCTOR( mulle_testallocator_load)
+static void   mulle_testallocator_load( void)
+{
+#ifdef MULLE_TESTALLOCATOR_DEBUG
+   fprintf( stderr, "mulle_testallocator_load: starting up\n");
+#endif
+   mulle_testallocator_initialize();
+}
+
+
+#if defined( _WIN32) && defined( MULLE_INCLUDE_DYNAMIC) && defined( MULLE_TESTALLOCATOR_DEBUG)
+BOOL WINAPI   DllMain( HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved )
+{
+   MULLE_C_UNUSED( hinstDLL);
+   MULLE_C_UNUSED( fdwReason);
+   MULLE_C_UNUSED( lpvReserved);
+
+   if( fdwReason == DLL_PROCESS_ATTACH)
+      fprintf( stderr, "mulle-testallocator DLL loaded\n");
+   return TRUE;
+}
+#endif

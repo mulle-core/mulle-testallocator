@@ -1,4 +1,5 @@
 # mulle-testallocator Library Documentation for AI
+<!-- Keywords: testing, memory-debugging -->
 
 ## 1. Introduction & Purpose
 

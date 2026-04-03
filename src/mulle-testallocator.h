@@ -98,6 +98,11 @@ void   _mulle_testallocator_detect_leaks( void);
 MULLE__TESTALLOCATOR_GLOBAL
 void   mulle_testallocator_bail( void *p);
 
+MULLE__TESTALLOCATOR_GLOBAL
+void   *mulle_testallocator_stdlib_realloc( void *q,
+                                            size_t size,
+                                            struct mulle_allocator *allocator);
+
 
 #ifdef __has_include
 # if __has_include( "_mulle-testallocator-versioncheck.h")

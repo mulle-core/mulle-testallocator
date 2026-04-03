@@ -14,6 +14,19 @@
 #ifndef _mulle_testallocator_include_private_h__
 #define _mulle_testallocator_include_private_h__
 
-/* no headers */
+// To remove the following dependency (headers and library) completely:
+//   `mulle-sde dependency remove mulle-dlfcn`
+// (Use 59E34F3E-49F3-442A-99F9-9F737CE6B733 instead of mulle-dlfcn, if there are duplicate entries)
+//
+// You can tweak the following #include with these commands:
+//    remove #include: `mulle-sde dependency mark mulle-dlfcn no-header`
+//    rename              : `mulle-sde dependency|library set mulle-dlfcn include whatever.h`
+//    reorder             : `mulle-sde dependency move mulle-dlfcn <up|down>`
+//    toggle objc         : `mulle-sde dependency mark mulle-dlfcn [no-]import`
+//    toggle public       : `mulle-sde dependency mark mulle-dlfcn [no-]public`
+//    toggle optional     : `mulle-sde dependency mark mulle-dlfcn [no-]require`
+//    remove for platform : `mulle-sde dependency mark mulle-dlfcn no-platform-<uname>`
+//        (use `mulle-sourcetree-to-c --unames` to list known values)
+#include <mulle-dlfcn/mulle-dlfcn.h>   // mulle-dlfcn
 
 #endif
