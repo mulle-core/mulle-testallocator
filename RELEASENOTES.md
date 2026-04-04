@@ -1,13 +1,12 @@
-# 6.0.0
+## 6.1.0
 
 
-* replaced atexit dependency checks with allocator checks
-* added dlfcn dependency version validation
 
 
-* rearchitected mulle-core dependencies
 
 
-* `mulle_default_allocator` renamed to `mulle_allocator_default`
-* `mulle_stdlib_allocator` renamed to `mulle_allocator_stdlib`
-* `mulle_stdlib_nofree_allocator` renamed to `mulle_allocator_stdlib_nofree`
+
+feature: export stdlib realloc wrapper and harden allocator init/reset
+
+* declare `mulle_testallocator_stdlib_realloc` in the public header so callers/tests can interpose or call the allocator's stdlib realloc wrapper
+* make allocator initialization and test helpers more robust: install allocator hooks reliably, add reset/detect-leak and cancel/reset paths for test workflows, and improve diagnostics/debug tracing
