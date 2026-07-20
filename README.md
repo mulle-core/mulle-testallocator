@@ -169,10 +169,11 @@ Or if you really want to do it exhaustively:
 | Requirements                                 | Description
 |----------------------------------------------|-----------------------
 | [mulle-allocator](https://github.com/mulle-c/mulle-allocator)             | 🔄 Flexible C memory allocation scheme
-| [mulle-atinit](https://github.com/mulle-core/mulle-atinit)             | 🤱🏼 Compatibility library for deterministic initializers
 | [mulle-dlfcn](https://github.com/mulle-core/mulle-dlfcn)             | ♿️ Shared library helper
-| [mulle-stacktrace](https://github.com/mulle-core/mulle-stacktrace)             | 👣 Stracktrace support for various OS
 | [mulle-thread](https://github.com/mulle-concurrent/mulle-thread)             | 🔠 Cross-platform thread/mutex/tss/atomic operations in C
+| [mulle-atinit](https://github.com/mulle-core/mulle-atinit)             | 🤱🏼 Compatibility library for deterministic initializers
+| [mulle-atexit](https://github.com/mulle-core/mulle-atexit)             | 👼 Compatibility library to fix atexit
+| [mulle-stacktrace](https://github.com/mulle-core/mulle-stacktrace)             | 👣 Stracktrace support for various OS
 
 #### Download & Install
 

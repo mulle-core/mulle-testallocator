@@ -10,7 +10,6 @@
       repo="mulle-testallocator";
       homepage="https://github.com/mulle-core/mulle-testallocator";
       license="BSD-3-Clause";
-      version="6.1.0";
    };
    dependencies =
    (
@@ -23,27 +22,11 @@
          user="mulle-c";
       },
       {
-         description="🤱🏼 Compatibility library for deterministic initializers";
-         domain="github";
-         name="mulle-atinit";
-         repo="mulle-atinit";
-         url="https://github.com/mulle-core/mulle-atinit";
-         user="mulle-core";
-      },
-      {
          description="♿️ Shared library helper";
          domain="github";
          name="mulle-dlfcn";
          repo="mulle-dlfcn";
          url="https://github.com/mulle-core/mulle-dlfcn";
-         user="mulle-core";
-      },
-      {
-         description="👣 Stracktrace support for various OS";
-         domain="github";
-         name="mulle-stacktrace";
-         repo="mulle-stacktrace";
-         url="https://github.com/mulle-core/mulle-stacktrace";
          user="mulle-core";
       },
       {
@@ -53,6 +36,30 @@
          repo="mulle-thread";
          url="https://github.com/mulle-concurrent/mulle-thread";
          user="mulle-concurrent";
+      },
+      {
+         description="🤱🏼 Compatibility library for deterministic initializers";
+         domain="github";
+         name="mulle-atinit";
+         repo="mulle-atinit";
+         url="https://github.com/mulle-core/mulle-atinit";
+         user="mulle-core";
+      },
+      {
+         description="👼 Compatibility library to fix atexit";
+         domain="github";
+         name="mulle-atexit";
+         repo="mulle-atexit";
+         url="https://github.com/mulle-core/mulle-atexit";
+         user="mulle-core";
+      },
+      {
+         description="👣 Stracktrace support for various OS";
+         domain="github";
+         name="mulle-stacktrace";
+         repo="mulle-stacktrace";
+         url="https://github.com/mulle-core/mulle-stacktrace";
+         user="mulle-core";
       }
    );
 }

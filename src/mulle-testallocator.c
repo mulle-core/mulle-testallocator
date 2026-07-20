@@ -123,6 +123,46 @@ static struct
    .trace = mulle_testallocator_trace_disabled
 };
 
+#if defined( _WIN32) && defined( MULLE_INCLUDE_DYNAMIC)
+typedef void   mulle_stacktrace_function_t( struct mulle_stacktrace *,
+                                            int,
+                                            enum mulle_stacktrace_format,
+                                            FILE *);
+typedef void   mulle_stacktrace_init_default_function_t( struct mulle_stacktrace *);
+
+static mulle_stacktrace_function_t               *p_mulle_stacktrace;
+static mulle_stacktrace_init_default_function_t  *p_mulle_stacktrace_init_default;
+#endif
+
+
+static int   mulle_testallocator_init_stacktrace( void)
+{
+#if defined( _WIN32) && defined( MULLE_INCLUDE_DYNAMIC)
+   p_mulle_stacktrace =
+      (mulle_stacktrace_function_t *) mulle_dlsym_exe( "_mulle_stacktrace");
+   p_mulle_stacktrace_init_default =
+      (mulle_stacktrace_init_default_function_t *)
+      mulle_dlsym_exe( "_mulle_stacktrace_init_default");
+   if( ! p_mulle_stacktrace || ! p_mulle_stacktrace_init_default)
+      return( 0);
+   (*p_mulle_stacktrace_init_default)( &local.stacktrace);
+#else
+   _mulle_stacktrace_init_default( &local.stacktrace);
+#endif
+   return( 1);
+}
+
+
+static void   mulle_testallocator_print_stacktrace( void)
+{
+#if defined( _WIN32) && defined( MULLE_INCLUDE_DYNAMIC)
+   if( p_mulle_stacktrace)
+      (*p_mulle_stacktrace)( &local.stacktrace, 1, mulle_stacktrace_trimmed, stderr);
+#else
+   _mulle_stacktrace( &local.stacktrace, 1, mulle_stacktrace_trimmed, stderr);
+#endif
+}
+
 
 //
 // unintialized data gets name mangled by cl.exe
@@ -157,7 +197,7 @@ static void   log_stacktrace( char *format, ...)
    {
       vfprintf( stderr, format, args);
       if( local.trace & mulle_testallocator_trace_stacktrace)
-         _mulle_stacktrace( &local.stacktrace, 1, mulle_stacktrace_trimmed, stderr);
+         mulle_testallocator_print_stacktrace();
       fputc( '\n', stderr);
    }
    va_end( args);
@@ -703,7 +743,12 @@ static void   _mulle_testallocator_initialize( void *unused)
          break;
       }
 
-      _mulle_stacktrace_init_default( &local.stacktrace);
+      if( ! mulle_testallocator_init_stacktrace())
+      {
+         if( local.trace & mulle_testallocator_trace_stacktrace)
+            trace_log( "stacktrace disabled as symbols were not found");
+         local.trace &= ~mulle_testallocator_trace_stacktrace;
+      }
 
       trace_log_pointer( "start:         mulle_testallocator_initialize", &mulle_testallocator_initialize);
       trace_log_pointer( "allocator:     mulle_allocator_default", &mulle_allocator_default);
