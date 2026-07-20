@@ -348,13 +348,13 @@ endif()
 
 
 #
-# Generated from sourcetree: 46AB981C-7796-414D-8B52-984F69957F6F;mulle-atinit;no-cmake-loader,no-cmake-searchpath,no-dynamic-link,no-import,no-singlephase;mulle-core-all-load,mulle-atinit
+# Generated from sourcetree: 46AB981C-7796-414D-8B52-984F69957F6F;mulle-atinit;no-cmake-loader,no-cmake-searchpath,no-dynamic-link,no-import,no-intermediate-link,no-singlephase;mulle-core-all-load,mulle-atinit
 # Disable with : `mulle-sourcetree mark mulle-atinit no-link`
 # Disable for this platform: `mulle-sourcetree mark mulle-atinit no-cmake-platform-${MULLE_UNAME}`
 # Disable for a sdk: `mulle-sourcetree mark mulle-atinit no-cmake-sdk-<name>`
 #
-if( COLLECT_ALL_LOAD_DEPENDENCY_LIBRARIES_AS_NAMES)
-   list( APPEND ALL_LOAD_DEPENDENCY_LIBRARIES "mulle-core-all-load")
+if( COLLECT_STARTUP_ALL_LOAD_DEPENDENCY_LIBRARIES_AS_NAMES)
+   list( APPEND STARTUP_ALL_LOAD_DEPENDENCY_LIBRARIES "mulle-core-all-load")
 else()
    if( NOT MULLE__ATINIT_LIBRARY)
       find_library( MULLE__ATINIT_LIBRARY NAMES
@@ -379,10 +379,10 @@ else()
       #
       if( MULLE__ATINIT_LIBRARY)
          #
-         # Add MULLE__ATINIT_LIBRARY to ALL_LOAD_DEPENDENCY_LIBRARIES list.
+         # Add MULLE__ATINIT_LIBRARY to STARTUP_ALL_LOAD_DEPENDENCY_LIBRARIES list.
          # Disable with: `mulle-sourcetree mark mulle-atinit no-cmake-add`
          #
-         list( APPEND ALL_LOAD_DEPENDENCY_LIBRARIES ${MULLE__ATINIT_LIBRARY})
+         list( APPEND STARTUP_ALL_LOAD_DEPENDENCY_LIBRARIES ${MULLE__ATINIT_LIBRARY})
          #
          # Inherit information from dependency.
          # Encompasses: no-cmake-searchpath,no-cmake-dependency,no-cmake-loader
@@ -437,13 +437,13 @@ endif()
 
 
 #
-# Generated from sourcetree: B17AB0CB-4F65-4183-8157-75DB7BD7CDBE;mulle-atexit;no-cmake-loader,no-cmake-searchpath,no-dynamic-link,no-import,no-singlephase;mulle-core-all-load,mulle-atexit
+# Generated from sourcetree: B17AB0CB-4F65-4183-8157-75DB7BD7CDBE;mulle-atexit;no-cmake-loader,no-cmake-searchpath,no-dynamic-link,no-import,no-intermediate-link,no-singlephase;mulle-core-all-load,mulle-atexit
 # Disable with : `mulle-sourcetree mark mulle-atexit no-link`
 # Disable for this platform: `mulle-sourcetree mark mulle-atexit no-cmake-platform-${MULLE_UNAME}`
 # Disable for a sdk: `mulle-sourcetree mark mulle-atexit no-cmake-sdk-<name>`
 #
-if( COLLECT_ALL_LOAD_DEPENDENCY_LIBRARIES_AS_NAMES)
-   list( APPEND ALL_LOAD_DEPENDENCY_LIBRARIES "mulle-core-all-load")
+if( COLLECT_STARTUP_ALL_LOAD_DEPENDENCY_LIBRARIES_AS_NAMES)
+   list( APPEND STARTUP_ALL_LOAD_DEPENDENCY_LIBRARIES "mulle-core-all-load")
 else()
    if( NOT MULLE__ATEXIT_LIBRARY)
       find_library( MULLE__ATEXIT_LIBRARY NAMES
@@ -468,10 +468,10 @@ else()
       #
       if( MULLE__ATEXIT_LIBRARY)
          #
-         # Add MULLE__ATEXIT_LIBRARY to ALL_LOAD_DEPENDENCY_LIBRARIES list.
+         # Add MULLE__ATEXIT_LIBRARY to STARTUP_ALL_LOAD_DEPENDENCY_LIBRARIES list.
          # Disable with: `mulle-sourcetree mark mulle-atexit no-cmake-add`
          #
-         list( APPEND ALL_LOAD_DEPENDENCY_LIBRARIES ${MULLE__ATEXIT_LIBRARY})
+         list( APPEND STARTUP_ALL_LOAD_DEPENDENCY_LIBRARIES ${MULLE__ATEXIT_LIBRARY})
          #
          # Inherit information from dependency.
          # Encompasses: no-cmake-searchpath,no-cmake-dependency,no-cmake-loader
@@ -526,40 +526,28 @@ endif()
 
 
 #
-# Generated from sourcetree: 8FDA4226-E7FF-4BC2-818E-9245794F64B7;mulle-stacktrace;no-all-load,no-cmake-loader,no-cmake-searchpath,no-import,no-singlephase;mulle-core-all-load,mulle-stacktrace
+# Generated from sourcetree: 8FDA4226-E7FF-4BC2-818E-9245794F64B7;mulle-stacktrace;no-cmake-loader,no-cmake-searchpath,no-dynamic-link,no-import,no-intermediate-link,no-singlephase;mulle-core-all-load,mulle-stacktrace
 # Disable with : `mulle-sourcetree mark mulle-stacktrace no-link`
 # Disable for this platform: `mulle-sourcetree mark mulle-stacktrace no-cmake-platform-${MULLE_UNAME}`
 # Disable for a sdk: `mulle-sourcetree mark mulle-stacktrace no-cmake-sdk-<name>`
 #
-if( COLLECT_DEPENDENCY_LIBRARIES_AS_NAMES)
-   list( APPEND DEPENDENCY_LIBRARIES "mulle-core-all-load")
+if( COLLECT_STARTUP_ALL_LOAD_DEPENDENCY_LIBRARIES_AS_NAMES)
+   list( APPEND STARTUP_ALL_LOAD_DEPENDENCY_LIBRARIES "mulle-core-all-load")
 else()
    if( NOT MULLE__STACKTRACE_LIBRARY)
       find_library( MULLE__STACKTRACE_LIBRARY NAMES
-         ${MULLE_PREFERRED_LIBRARY_PREFIX}mulle-core-all-load${CMAKE_DEBUG_POSTFIX}${MULLE_PREFERRED_LIBRARY_SUFFIX}
-         ${MULLE_PREFERRED_LIBRARY_PREFIX}mulle-core-all-load${MULLE_PREFERRED_LIBRARY_SUFFIX}
-         ${MULLE_FALLBACK_LIBRARY_PREFIX}mulle-core-all-load${CMAKE_DEBUG_POSTFIX}${MULLE_FALLBACK_LIBRARY_SUFFIX}
-         ${MULLE_FALLBACK_LIBRARY_PREFIX}mulle-core-all-load${MULLE_FALLBACK_LIBRARY_SUFFIX}
-         mulle-core-all-load
-         ${MULLE_PREFERRED_LIBRARY_PREFIX}mulle-stacktrace${CMAKE_DEBUG_POSTFIX}${MULLE_PREFERRED_LIBRARY_SUFFIX}
-         ${MULLE_PREFERRED_LIBRARY_PREFIX}mulle-stacktrace${MULLE_PREFERRED_LIBRARY_SUFFIX}
-         ${MULLE_FALLBACK_LIBRARY_PREFIX}mulle-stacktrace${CMAKE_DEBUG_POSTFIX}${MULLE_FALLBACK_LIBRARY_SUFFIX}
-         ${MULLE_FALLBACK_LIBRARY_PREFIX}mulle-stacktrace${MULLE_FALLBACK_LIBRARY_SUFFIX}
-         mulle-stacktrace
+         ${CMAKE_STATIC_LIBRARY_PREFIX}mulle-core-all-load${CMAKE_DEBUG_POSTFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}
+         ${CMAKE_STATIC_LIBRARY_PREFIX}mulle-core-all-load${CMAKE_STATIC_LIBRARY_SUFFIX}
+         ${CMAKE_STATIC_LIBRARY_PREFIX}mulle-stacktrace${CMAKE_DEBUG_POSTFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}
+         ${CMAKE_STATIC_LIBRARY_PREFIX}mulle-stacktrace${CMAKE_STATIC_LIBRARY_SUFFIX}
          NO_CMAKE_SYSTEM_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_FIND_ROOT_PATH
       )
       if( NOT MULLE__STACKTRACE_LIBRARY AND NOT DEPENDENCY_IGNORE_SYSTEM_LIBARIES)
          find_library( MULLE__STACKTRACE_LIBRARY NAMES
-            ${MULLE_PREFERRED_LIBRARY_PREFIX}mulle-core-all-load${CMAKE_DEBUG_POSTFIX}${MULLE_PREFERRED_LIBRARY_SUFFIX}
-            ${MULLE_PREFERRED_LIBRARY_PREFIX}mulle-core-all-load${MULLE_PREFERRED_LIBRARY_SUFFIX}
-            ${MULLE_FALLBACK_LIBRARY_PREFIX}mulle-core-all-load${CMAKE_DEBUG_POSTFIX}${MULLE_FALLBACK_LIBRARY_SUFFIX}
-            ${MULLE_FALLBACK_LIBRARY_PREFIX}mulle-core-all-load${MULLE_FALLBACK_LIBRARY_SUFFIX}
-            mulle-core-all-load
-            ${MULLE_PREFERRED_LIBRARY_PREFIX}mulle-stacktrace${CMAKE_DEBUG_POSTFIX}${MULLE_PREFERRED_LIBRARY_SUFFIX}
-            ${MULLE_PREFERRED_LIBRARY_PREFIX}mulle-stacktrace${MULLE_PREFERRED_LIBRARY_SUFFIX}
-            ${MULLE_FALLBACK_LIBRARY_PREFIX}mulle-stacktrace${CMAKE_DEBUG_POSTFIX}${MULLE_FALLBACK_LIBRARY_SUFFIX}
-            ${MULLE_FALLBACK_LIBRARY_PREFIX}mulle-stacktrace${MULLE_FALLBACK_LIBRARY_SUFFIX}
-            mulle-stacktrace
+            ${CMAKE_STATIC_LIBRARY_PREFIX}mulle-core-all-load${CMAKE_DEBUG_POSTFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}
+            ${CMAKE_STATIC_LIBRARY_PREFIX}mulle-core-all-load${CMAKE_STATIC_LIBRARY_SUFFIX}
+            ${CMAKE_STATIC_LIBRARY_PREFIX}mulle-stacktrace${CMAKE_DEBUG_POSTFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}
+            ${CMAKE_STATIC_LIBRARY_PREFIX}mulle-stacktrace${CMAKE_STATIC_LIBRARY_SUFFIX}
          )
       endif()
       message( STATUS "MULLE__STACKTRACE_LIBRARY is ${MULLE__STACKTRACE_LIBRARY}")
@@ -569,10 +557,10 @@ else()
       #
       if( MULLE__STACKTRACE_LIBRARY)
          #
-         # Add MULLE__STACKTRACE_LIBRARY to DEPENDENCY_LIBRARIES list.
+         # Add MULLE__STACKTRACE_LIBRARY to STARTUP_ALL_LOAD_DEPENDENCY_LIBRARIES list.
          # Disable with: `mulle-sourcetree mark mulle-stacktrace no-cmake-add`
          #
-         list( APPEND DEPENDENCY_LIBRARIES ${MULLE__STACKTRACE_LIBRARY})
+         list( APPEND STARTUP_ALL_LOAD_DEPENDENCY_LIBRARIES ${MULLE__STACKTRACE_LIBRARY})
          #
          # Inherit information from dependency.
          # Encompasses: no-cmake-searchpath,no-cmake-dependency,no-cmake-loader
@@ -617,16 +605,10 @@ else()
          endforeach()
       else()
          # Disable with: `mulle-sourcetree mark mulle-stacktrace no-require-link`
-         message( SEND_ERROR "MULLE__STACKTRACE_LIBRARY was not found in ${MULLE_PREFERRED_LIBRARY_PREFIX}mulle-core-all-load${CMAKE_DEBUG_POSTFIX}${MULLE_PREFERRED_LIBRARY_SUFFIX}
-${MULLE_PREFERRED_LIBRARY_PREFIX}mulle-core-all-load${MULLE_PREFERRED_LIBRARY_SUFFIX}
-${MULLE_FALLBACK_LIBRARY_PREFIX}mulle-core-all-load${CMAKE_DEBUG_POSTFIX}${MULLE_FALLBACK_LIBRARY_SUFFIX}
-${MULLE_FALLBACK_LIBRARY_PREFIX}mulle-core-all-load${MULLE_FALLBACK_LIBRARY_SUFFIX}
-mulle-core-all-load
-${MULLE_PREFERRED_LIBRARY_PREFIX}mulle-stacktrace${CMAKE_DEBUG_POSTFIX}${MULLE_PREFERRED_LIBRARY_SUFFIX}
-${MULLE_PREFERRED_LIBRARY_PREFIX}mulle-stacktrace${MULLE_PREFERRED_LIBRARY_SUFFIX}
-${MULLE_FALLBACK_LIBRARY_PREFIX}mulle-stacktrace${CMAKE_DEBUG_POSTFIX}${MULLE_FALLBACK_LIBRARY_SUFFIX}
-${MULLE_FALLBACK_LIBRARY_PREFIX}mulle-stacktrace${MULLE_FALLBACK_LIBRARY_SUFFIX}
-mulle-stacktrace")
+         message( SEND_ERROR "MULLE__STACKTRACE_LIBRARY was not found in ${CMAKE_STATIC_LIBRARY_PREFIX}mulle-core-all-load${CMAKE_DEBUG_POSTFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}
+${CMAKE_STATIC_LIBRARY_PREFIX}mulle-core-all-load${CMAKE_STATIC_LIBRARY_SUFFIX}
+${CMAKE_STATIC_LIBRARY_PREFIX}mulle-stacktrace${CMAKE_DEBUG_POSTFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}
+${CMAKE_STATIC_LIBRARY_PREFIX}mulle-stacktrace${CMAKE_STATIC_LIBRARY_SUFFIX}")
       endif()
    endif()
 endif()
