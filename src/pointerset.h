@@ -1,11 +1,11 @@
 //
 //  pointerset.h
-//  mulle-aba-test
+//  mulle-testallocator
 //
-//  Created by Nat! on 10.03.15.
-//  Copyright (c) 2015 Nat! - Mulle kybernetiK.
+//  Copyright (c) 2016 Nat! - Mulle kybernetiK.
 //  Copyright (c) 2015 Codeon GmbH.
 //  All rights reserved.
+//
 //
 //  Redistribution and use in source and binary forms, with or without
 //  modification, are permitted provided that the following conditions are met:
