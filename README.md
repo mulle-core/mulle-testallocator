@@ -25,6 +25,11 @@ Debug support can be turned on and off with environment variables.
 | `MULLE_TESTALLOCATOR_FIRST_LEAK` | Only report the first leak if set to 1 or YES.
 | `MULLE_TESTALLOCATOR_MAX_SIZE`   | Creates an out of memory condition if more than max size is allocated (in one call)
 
+
+## Documentation & Guides
+
+* [API Summary](asset/dox/api/toc)
+
 ## Usage
 
 ###  Use `mulle_testallocator` for leak detection
