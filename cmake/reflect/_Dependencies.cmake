@@ -72,16 +72,15 @@ else()
          endif()
       endif()
       message( STATUS "MULLE__ALLOCATOR_LIBRARY is ${MULLE__ALLOCATOR_LIBRARY}")
-      #
-      # The order looks ascending, but due to the way this file is read
-      # it ends up being descending, which is what we need.
-      #
-      if( MULLE__ALLOCATOR_LIBRARY)
+   endif()
+   if( MULLE__ALLOCATOR_LIBRARY)
          #
          # Add MULLE__ALLOCATOR_LIBRARY to DEPENDENCY_LIBRARIES list.
          # Disable with: `mulle-sourcetree mark mulle-allocator no-cmake-add`
          #
-         list( APPEND DEPENDENCY_LIBRARIES ${MULLE__ALLOCATOR_LIBRARY})
+         if( NOT ${MULLE__ALLOCATOR_LIBRARY} IN_LIST DEPENDENCY_LIBRARIES)
+            list( APPEND DEPENDENCY_LIBRARIES ${MULLE__ALLOCATOR_LIBRARY})
+         endif()
          #
          # Inherit information from dependency.
          # Encompasses: no-cmake-searchpath,no-cmake-dependency,no-cmake-loader
@@ -124,9 +123,9 @@ else()
                message( STATUS "${_TMP_MULLE__ALLOCATOR_DIR} not found")
             endif()
          endforeach()
-      else()
-         # Disable with: `mulle-sourcetree mark mulle-allocator no-require-link`
-         message( SEND_ERROR "MULLE__ALLOCATOR_LIBRARY was not found in ${MULLE_PREFERRED_LIBRARY_PREFIX}mulle-core${CMAKE_DEBUG_POSTFIX}${MULLE_PREFERRED_LIBRARY_SUFFIX}
+   else()
+      # Disable with: `mulle-sourcetree mark mulle-allocator no-require-link`
+      message( SEND_ERROR "MULLE__ALLOCATOR_LIBRARY was not found in ${MULLE_PREFERRED_LIBRARY_PREFIX}mulle-core${CMAKE_DEBUG_POSTFIX}${MULLE_PREFERRED_LIBRARY_SUFFIX}
 ${MULLE_PREFERRED_LIBRARY_PREFIX}mulle-core${MULLE_PREFERRED_LIBRARY_SUFFIX}
 ${MULLE_FALLBACK_LIBRARY_PREFIX}mulle-core${CMAKE_DEBUG_POSTFIX}${MULLE_FALLBACK_LIBRARY_SUFFIX}
 ${MULLE_FALLBACK_LIBRARY_PREFIX}mulle-core${MULLE_FALLBACK_LIBRARY_SUFFIX}
@@ -136,7 +135,6 @@ ${MULLE_PREFERRED_LIBRARY_PREFIX}mulle-allocator${MULLE_PREFERRED_LIBRARY_SUFFIX
 ${MULLE_FALLBACK_LIBRARY_PREFIX}mulle-allocator${CMAKE_DEBUG_POSTFIX}${MULLE_FALLBACK_LIBRARY_SUFFIX}
 ${MULLE_FALLBACK_LIBRARY_PREFIX}mulle-allocator${MULLE_FALLBACK_LIBRARY_SUFFIX}
 mulle-allocator")
-      endif()
    endif()
 endif()
 
@@ -187,16 +185,15 @@ else()
          endif()
       endif()
       message( STATUS "MULLE__DLFCN_LIBRARY is ${MULLE__DLFCN_LIBRARY}")
-      #
-      # The order looks ascending, but due to the way this file is read
-      # it ends up being descending, which is what we need.
-      #
-      if( MULLE__DLFCN_LIBRARY)
+   endif()
+   if( MULLE__DLFCN_LIBRARY)
          #
          # Add MULLE__DLFCN_LIBRARY to DEPENDENCY_LIBRARIES list.
          # Disable with: `mulle-sourcetree mark mulle-dlfcn no-cmake-add`
          #
-         list( APPEND DEPENDENCY_LIBRARIES ${MULLE__DLFCN_LIBRARY})
+         if( NOT ${MULLE__DLFCN_LIBRARY} IN_LIST DEPENDENCY_LIBRARIES)
+            list( APPEND DEPENDENCY_LIBRARIES ${MULLE__DLFCN_LIBRARY})
+         endif()
          #
          # Inherit information from dependency.
          # Encompasses: no-cmake-searchpath,no-cmake-dependency,no-cmake-loader
@@ -239,9 +236,9 @@ else()
                message( STATUS "${_TMP_MULLE__DLFCN_DIR} not found")
             endif()
          endforeach()
-      else()
-         # Disable with: `mulle-sourcetree mark mulle-dlfcn no-require-link`
-         message( SEND_ERROR "MULLE__DLFCN_LIBRARY was not found in ${MULLE_PREFERRED_LIBRARY_PREFIX}mulle-core${CMAKE_DEBUG_POSTFIX}${MULLE_PREFERRED_LIBRARY_SUFFIX}
+   else()
+      # Disable with: `mulle-sourcetree mark mulle-dlfcn no-require-link`
+      message( SEND_ERROR "MULLE__DLFCN_LIBRARY was not found in ${MULLE_PREFERRED_LIBRARY_PREFIX}mulle-core${CMAKE_DEBUG_POSTFIX}${MULLE_PREFERRED_LIBRARY_SUFFIX}
 ${MULLE_PREFERRED_LIBRARY_PREFIX}mulle-core${MULLE_PREFERRED_LIBRARY_SUFFIX}
 ${MULLE_FALLBACK_LIBRARY_PREFIX}mulle-core${CMAKE_DEBUG_POSTFIX}${MULLE_FALLBACK_LIBRARY_SUFFIX}
 ${MULLE_FALLBACK_LIBRARY_PREFIX}mulle-core${MULLE_FALLBACK_LIBRARY_SUFFIX}
@@ -251,7 +248,6 @@ ${MULLE_PREFERRED_LIBRARY_PREFIX}mulle-dlfcn${MULLE_PREFERRED_LIBRARY_SUFFIX}
 ${MULLE_FALLBACK_LIBRARY_PREFIX}mulle-dlfcn${CMAKE_DEBUG_POSTFIX}${MULLE_FALLBACK_LIBRARY_SUFFIX}
 ${MULLE_FALLBACK_LIBRARY_PREFIX}mulle-dlfcn${MULLE_FALLBACK_LIBRARY_SUFFIX}
 mulle-dlfcn")
-      endif()
    endif()
 endif()
 
@@ -302,16 +298,15 @@ else()
          endif()
       endif()
       message( STATUS "MULLE__THREAD_LIBRARY is ${MULLE__THREAD_LIBRARY}")
-      #
-      # The order looks ascending, but due to the way this file is read
-      # it ends up being descending, which is what we need.
-      #
-      if( MULLE__THREAD_LIBRARY)
+   endif()
+   if( MULLE__THREAD_LIBRARY)
          #
          # Add MULLE__THREAD_LIBRARY to DEPENDENCY_LIBRARIES list.
          # Disable with: `mulle-sourcetree mark mulle-thread no-cmake-add`
          #
-         list( APPEND DEPENDENCY_LIBRARIES ${MULLE__THREAD_LIBRARY})
+         if( NOT ${MULLE__THREAD_LIBRARY} IN_LIST DEPENDENCY_LIBRARIES)
+            list( APPEND DEPENDENCY_LIBRARIES ${MULLE__THREAD_LIBRARY})
+         endif()
          #
          # Inherit information from dependency.
          # Encompasses: no-cmake-searchpath,no-cmake-dependency,no-cmake-loader
@@ -354,9 +349,9 @@ else()
                message( STATUS "${_TMP_MULLE__THREAD_DIR} not found")
             endif()
          endforeach()
-      else()
-         # Disable with: `mulle-sourcetree mark mulle-thread no-require-link`
-         message( SEND_ERROR "MULLE__THREAD_LIBRARY was not found in ${MULLE_PREFERRED_LIBRARY_PREFIX}mulle-core${CMAKE_DEBUG_POSTFIX}${MULLE_PREFERRED_LIBRARY_SUFFIX}
+   else()
+      # Disable with: `mulle-sourcetree mark mulle-thread no-require-link`
+      message( SEND_ERROR "MULLE__THREAD_LIBRARY was not found in ${MULLE_PREFERRED_LIBRARY_PREFIX}mulle-core${CMAKE_DEBUG_POSTFIX}${MULLE_PREFERRED_LIBRARY_SUFFIX}
 ${MULLE_PREFERRED_LIBRARY_PREFIX}mulle-core${MULLE_PREFERRED_LIBRARY_SUFFIX}
 ${MULLE_FALLBACK_LIBRARY_PREFIX}mulle-core${CMAKE_DEBUG_POSTFIX}${MULLE_FALLBACK_LIBRARY_SUFFIX}
 ${MULLE_FALLBACK_LIBRARY_PREFIX}mulle-core${MULLE_FALLBACK_LIBRARY_SUFFIX}
@@ -366,7 +361,6 @@ ${MULLE_PREFERRED_LIBRARY_PREFIX}mulle-thread${MULLE_PREFERRED_LIBRARY_SUFFIX}
 ${MULLE_FALLBACK_LIBRARY_PREFIX}mulle-thread${CMAKE_DEBUG_POSTFIX}${MULLE_FALLBACK_LIBRARY_SUFFIX}
 ${MULLE_FALLBACK_LIBRARY_PREFIX}mulle-thread${MULLE_FALLBACK_LIBRARY_SUFFIX}
 mulle-thread")
-      endif()
    endif()
 endif()
 
@@ -405,16 +399,15 @@ else()
          endif()
       endif()
       message( STATUS "MULLE__ATINIT_LIBRARY is ${MULLE__ATINIT_LIBRARY}")
-      #
-      # The order looks ascending, but due to the way this file is read
-      # it ends up being descending, which is what we need.
-      #
-      if( MULLE__ATINIT_LIBRARY)
+   endif()
+   if( MULLE__ATINIT_LIBRARY)
          #
          # Add MULLE__ATINIT_LIBRARY to STARTUP_ALL_LOAD_DEPENDENCY_LIBRARIES list.
          # Disable with: `mulle-sourcetree mark mulle-atinit no-cmake-add`
          #
-         list( APPEND STARTUP_ALL_LOAD_DEPENDENCY_LIBRARIES ${MULLE__ATINIT_LIBRARY})
+         if( NOT ${MULLE__ATINIT_LIBRARY} IN_LIST STARTUP_ALL_LOAD_DEPENDENCY_LIBRARIES)
+            list( APPEND STARTUP_ALL_LOAD_DEPENDENCY_LIBRARIES ${MULLE__ATINIT_LIBRARY})
+         endif()
          #
          # Inherit information from dependency.
          # Encompasses: no-cmake-searchpath,no-cmake-dependency,no-cmake-loader
@@ -457,13 +450,12 @@ else()
                message( STATUS "${_TMP_MULLE__ATINIT_DIR} not found")
             endif()
          endforeach()
-      else()
-         # Disable with: `mulle-sourcetree mark mulle-atinit no-require-link`
-         message( SEND_ERROR "MULLE__ATINIT_LIBRARY was not found in ${CMAKE_STATIC_LIBRARY_PREFIX}mulle-core-all-load${CMAKE_DEBUG_POSTFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}
+   else()
+      # Disable with: `mulle-sourcetree mark mulle-atinit no-require-link`
+      message( SEND_ERROR "MULLE__ATINIT_LIBRARY was not found in ${CMAKE_STATIC_LIBRARY_PREFIX}mulle-core-all-load${CMAKE_DEBUG_POSTFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}
 ${CMAKE_STATIC_LIBRARY_PREFIX}mulle-core-all-load${CMAKE_STATIC_LIBRARY_SUFFIX}
 ${CMAKE_STATIC_LIBRARY_PREFIX}mulle-atinit${CMAKE_DEBUG_POSTFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}
 ${CMAKE_STATIC_LIBRARY_PREFIX}mulle-atinit${CMAKE_STATIC_LIBRARY_SUFFIX}")
-      endif()
    endif()
 endif()
 
@@ -502,16 +494,15 @@ else()
          endif()
       endif()
       message( STATUS "MULLE__ATEXIT_LIBRARY is ${MULLE__ATEXIT_LIBRARY}")
-      #
-      # The order looks ascending, but due to the way this file is read
-      # it ends up being descending, which is what we need.
-      #
-      if( MULLE__ATEXIT_LIBRARY)
+   endif()
+   if( MULLE__ATEXIT_LIBRARY)
          #
          # Add MULLE__ATEXIT_LIBRARY to STARTUP_ALL_LOAD_DEPENDENCY_LIBRARIES list.
          # Disable with: `mulle-sourcetree mark mulle-atexit no-cmake-add`
          #
-         list( APPEND STARTUP_ALL_LOAD_DEPENDENCY_LIBRARIES ${MULLE__ATEXIT_LIBRARY})
+         if( NOT ${MULLE__ATEXIT_LIBRARY} IN_LIST STARTUP_ALL_LOAD_DEPENDENCY_LIBRARIES)
+            list( APPEND STARTUP_ALL_LOAD_DEPENDENCY_LIBRARIES ${MULLE__ATEXIT_LIBRARY})
+         endif()
          #
          # Inherit information from dependency.
          # Encompasses: no-cmake-searchpath,no-cmake-dependency,no-cmake-loader
@@ -554,13 +545,12 @@ else()
                message( STATUS "${_TMP_MULLE__ATEXIT_DIR} not found")
             endif()
          endforeach()
-      else()
-         # Disable with: `mulle-sourcetree mark mulle-atexit no-require-link`
-         message( SEND_ERROR "MULLE__ATEXIT_LIBRARY was not found in ${CMAKE_STATIC_LIBRARY_PREFIX}mulle-core-all-load${CMAKE_DEBUG_POSTFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}
+   else()
+      # Disable with: `mulle-sourcetree mark mulle-atexit no-require-link`
+      message( SEND_ERROR "MULLE__ATEXIT_LIBRARY was not found in ${CMAKE_STATIC_LIBRARY_PREFIX}mulle-core-all-load${CMAKE_DEBUG_POSTFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}
 ${CMAKE_STATIC_LIBRARY_PREFIX}mulle-core-all-load${CMAKE_STATIC_LIBRARY_SUFFIX}
 ${CMAKE_STATIC_LIBRARY_PREFIX}mulle-atexit${CMAKE_DEBUG_POSTFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}
 ${CMAKE_STATIC_LIBRARY_PREFIX}mulle-atexit${CMAKE_STATIC_LIBRARY_SUFFIX}")
-      endif()
    endif()
 endif()
 
@@ -599,16 +589,15 @@ else()
          endif()
       endif()
       message( STATUS "MULLE__STACKTRACE_LIBRARY is ${MULLE__STACKTRACE_LIBRARY}")
-      #
-      # The order looks ascending, but due to the way this file is read
-      # it ends up being descending, which is what we need.
-      #
-      if( MULLE__STACKTRACE_LIBRARY)
+   endif()
+   if( MULLE__STACKTRACE_LIBRARY)
          #
          # Add MULLE__STACKTRACE_LIBRARY to STARTUP_ALL_LOAD_DEPENDENCY_LIBRARIES list.
          # Disable with: `mulle-sourcetree mark mulle-stacktrace no-cmake-add`
          #
-         list( APPEND STARTUP_ALL_LOAD_DEPENDENCY_LIBRARIES ${MULLE__STACKTRACE_LIBRARY})
+         if( NOT ${MULLE__STACKTRACE_LIBRARY} IN_LIST STARTUP_ALL_LOAD_DEPENDENCY_LIBRARIES)
+            list( APPEND STARTUP_ALL_LOAD_DEPENDENCY_LIBRARIES ${MULLE__STACKTRACE_LIBRARY})
+         endif()
          #
          # Inherit information from dependency.
          # Encompasses: no-cmake-searchpath,no-cmake-dependency,no-cmake-loader
@@ -651,12 +640,11 @@ else()
                message( STATUS "${_TMP_MULLE__STACKTRACE_DIR} not found")
             endif()
          endforeach()
-      else()
-         # Disable with: `mulle-sourcetree mark mulle-stacktrace no-require-link`
-         message( SEND_ERROR "MULLE__STACKTRACE_LIBRARY was not found in ${CMAKE_STATIC_LIBRARY_PREFIX}mulle-core-all-load${CMAKE_DEBUG_POSTFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}
+   else()
+      # Disable with: `mulle-sourcetree mark mulle-stacktrace no-require-link`
+      message( SEND_ERROR "MULLE__STACKTRACE_LIBRARY was not found in ${CMAKE_STATIC_LIBRARY_PREFIX}mulle-core-all-load${CMAKE_DEBUG_POSTFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}
 ${CMAKE_STATIC_LIBRARY_PREFIX}mulle-core-all-load${CMAKE_STATIC_LIBRARY_SUFFIX}
 ${CMAKE_STATIC_LIBRARY_PREFIX}mulle-stacktrace${CMAKE_DEBUG_POSTFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}
 ${CMAKE_STATIC_LIBRARY_PREFIX}mulle-stacktrace${CMAKE_STATIC_LIBRARY_SUFFIX}")
-      endif()
    endif()
 endif()
