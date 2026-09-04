@@ -40,7 +40,7 @@
 
 #include "mulle-testallocator-struct.h"
 
-#define MULLE__TESTALLOCATOR_VERSION    ((6UL << 20) | (1 << 8) | 1)
+#define MULLE__TESTALLOCATOR_VERSION    ((6UL << 20) | (2 << 8) | 0)
 
 MULLE__TESTALLOCATOR_GLOBAL struct _mulle_testallocator_config   mulle_testallocator_config;
 MULLE__TESTALLOCATOR_GLOBAL struct mulle_allocator               mulle_testallocator;
@@ -101,6 +101,17 @@ MULLE__TESTALLOCATOR_GLOBAL
 void   *mulle_testallocator_stdlib_realloc( void *q,
                                             size_t size,
                                             struct mulle_allocator *allocator);
+
+
+
+/**
+ * Checks if the given `mulle_allocator` instance is the test allocator.
+ *
+ * @param p The `mulle_allocator` instance to check.
+ * @return 1 if the allocator is the test allocator, 0 otherwise.
+ */
+MULLE__TESTALLOCATOR_GLOBAL
+int   mulle_allocator_is_testallocator( const struct mulle_allocator *p);
 
 
 #ifdef __has_include

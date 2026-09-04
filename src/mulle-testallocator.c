@@ -469,6 +469,22 @@ struct mulle_allocator   mulle_testallocator =
 };
 
 
+
+int   mulle_allocator_is_testallocator( const struct mulle_allocator *p)
+{
+   if( ! p)
+      return( 0);
+   if( p->calloc != mulle_testallocator.calloc)
+      return( 0);
+   if( p->realloc != mulle_testallocator.realloc)
+      return( 0);
+   if( p->free != mulle_testallocator.free)
+      return( 0);
+   if( p->fail != mulle_testallocator.fail)
+      return( 0);
+   return( 1);
+}
+
 #pragma mark - reset allocator between tests
 
 static int   _is_yes_no( char *s)

@@ -8,7 +8,7 @@
       name="mulle-testallocator";
       user="mulle-core";
       repo="mulle-testallocator";
-      version="6.1.1";
+      version="6.2.0";
       homepage="https://github.com/mulle-core/mulle-testallocator";
       license="BSD-3-Clause";
    };

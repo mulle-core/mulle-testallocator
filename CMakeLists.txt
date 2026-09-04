@@ -1,6 +1,6 @@
 cmake_minimum_required( VERSION 3.13...99.99)
 
-project( mulle-testallocator VERSION 6.1.1 LANGUAGES C)
+project( mulle-testallocator VERSION 6.2.0 LANGUAGES C)
 
 
 ### mulle-sde environment
@@ -50,7 +50,7 @@ endif()
 # keep reference to mulle-allocator open, don't link
 if( LINK_PHASE AND APPLE)
    if( BUILD_SHARED_LIBS)
-      target_link_libraries( "${LIBRARY_NAME}" "-undefined dynamic_lookup")
+      target_link_libraries( "${LIBRARY_NAME}" PRIVATE "-undefined dynamic_lookup")
    endif()
 endif()
 
