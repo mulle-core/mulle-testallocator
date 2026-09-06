@@ -1,374 +1,307 @@
 # mulle-testallocator Library Documentation for AI
-<!-- Keywords: allocator, leak, debug, test, malloc, free, tracer -->
+<!-- Keywords: allocator, leak, free, trace, test, malloc, memory -->
 ## 1. Introduction & Purpose
 
-- mulle-testallocator provides a drop-in test allocator for C programs that detects leaks, double-frees and supports tracing and basic stdlib patching. It exposes a mulle_allocator instance and a configuration struct to control behaviors (bail handler, scribble, max size, dont_free).
-- Solves: automated leak/double-free detection during unit tests and controlled allocation behavior for tests.
-- Key features: initialize/reset/cancel lifecycle, leak detection toggles, trace levels, max-size capping, stdlib realloc wrapper, and simple inlined helper containers used for bookkeeping.
-- Relationship: a testing-support component that integrates with mulle-allocator and the mulle-* ecosystem.
+- mulle-testallocator is a drop-in replacement allocator for C programs that detects memory leaks, double frees, false frees and false reallocs during tests (and at runtime). It implements the `struct mulle_allocator` interface defined by `mulle-allocator`.
+- Solves: automated leak/double-free detection without code changes. Just link the library (with whole-archive / `all-load` semantics) and run the program with the `MULLE_TESTALLOCATOR` environment variable; a C constructor patches the default allocators and an atexit handler reports leaks on exit.
+- Key features: manual initialize/reset/cancel lifecycle, leak detection toggles, configurable trace levels, allocation size capping (out-of-memory simulation), stdlib `realloc` scribbling, and fail-fast bailing on erroneous frees.
+- Relationship: a foundational testing component of the `mulle-core` ecosystem. It builds upon `mulle-allocator` and uses `mulle-thread`, `mulle-atinit`, `mulle-atexit` and `mulle-stacktrace`.
 
 ## 2. Key Concepts & Design Philosophy
 
-- Design: a test allocator that can replace the default allocator during tests, track allocations in lightweight inlined structures (pointerarray, pointerset, blockset) and report or bail on bad states.
-- Leak detection is opt-in: reset/detect flags control whether allocations are checked.
-- Minimal runtime overhead for normal usage; helpers are implemented as inlined headers for easy reuse in tests.
-- Not thread-safe by default; designed for single-threaded test harnesses unless external locking is provided.
+- The core object is a global `struct mulle_allocator` instance named `mulle_testallocator`. All its operations are wrapped: allocations are recorded into an internal open-addressing pointer set, frees into another. Because it conforms to the standard allocator interface, it can be swapped in via `mulle_default_allocator = mulle_testallocator;`.
+- Fail-fast on errors: on a double free, false free or false realloc, the library prints a message to `stderr` and calls the configured "bail" vector (by default `abort()`). This stops the program at the exact offending operation, which is much easier to debug than continuing with corrupted memory.
+- Leak detection is opt-in and scoped: `mulle_testallocator_reset()` checks for leaks among currently tracked allocations, prints `### leak <address>` lines to `stderr`, then clears the tracking state, acting as a checkpoint between tests.
+- Automatic activation: `mulle_testallocator_initialize()` registers a high-priority `mulle_atinit` initializer. That initializer reads environment variables, patches `mulle_allocator_default`, `mulle_allocator_stdlib` and `mulle_allocator_stdlib_nofree`, and registers an atexit handler (`_mulle_atexit`) that runs the leak check at program exit.
+- Scribbling: newly allocated memory through the allocator is filled with `0xF3A7F3A7`, and the stdlib `realloc` wrapper fills fresh stdlib allocations with `0xCAF3CAF3`, helping to expose use of uninitialized data. Both behaviors can be disabled via config/env.
+- Inlined helper containers (`pointerarray.h`, `pointerset.h`, root `blockset.h`) are plain C, all-inlined utilities used for the test allocator's bookkeeping; they can be reused in tests.
 
 ## 3. Core API & Data Structures
 
-This is the most critical section. It is organized by header files.
+All signatures copied verbatim from the header files.
 
 ### 3.1. src/mulle-testallocator.h
 
-- Globals:
-  - MULLE__TESTALLOCATOR_GLOBAL struct _mulle_testallocator_config   mulle_testallocator_config;
-  - MULLE__TESTALLOCATOR_GLOBAL struct mulle_allocator               mulle_testallocator;
+#### Global instances
 
-- Lifecycle:
-  - void mulle_testallocator_initialize( void);
-    - Initialize internal tables and optionally patch stdlib. Call once before using the allocator in tests.
-  - void mulle_testallocator_reset_detect_leaks( int detect);
-    - Enable (1) or disable (0) leak detection. Used by reset/discard helpers below.
-  - static inline void mulle_testallocator_discard( void)
-    - Shorthand to turn leak detection off for the current run.
-  - static inline void mulle_testallocator_reset( void)
-    - Shorthand to enable leak detection (start clean sheet).
-  - void mulle_testallocator_cancel( void);
-    - Finalize and free internal state; call at test end if using discard previously.
+```c
+MULLE__TESTALLOCATOR_GLOBAL struct _mulle_testallocator_config   mulle_testallocator_config;
+MULLE__TESTALLOCATOR_GLOBAL struct mulle_allocator               mulle_testallocator;
+```
 
-- Configuration and control:
-  - void mulle_testallocator_set_tracelevel( unsigned int value);
-    - 0..2 for verbosity; -1 to turn off tracing.
-  - void mulle_testallocator_set_max_size( size_t value);
-    - Set a maximum allocation size (0 disables).
-  - void mulle_testallocator_set_stacktracesymbolizer( void (*f)( void));
-    - Provide a function pointer used to enhance backtrace strings.
-  - void mulle_testallocator_reset_detect_leaks( int detect);
-    - Lower-level control; unlocked functions exist for internal use:
-      - void _mulle_testallocator_reset( void);
-      - void _mulle_testallocator_detect_leaks( void);
+- `mulle_testallocator`: the global `struct mulle_allocator` instance implementing the tracking allocator. Assign it to `mulle_default_allocator` to route all `mulle_malloc`/`mulle_free` allocations through it.
+- `mulle_testallocator_config`: the global configuration struct (see `mulle-testallocator-struct.h`). Modify it (or let env vars do so at init) to change runtime behavior like `dont_free`, `dont_scribble`, `max_size`.
 
-- Error handling:
-  - void mulle_testallocator_bail( void *p);
-    - Called on fatal allocator errors; default calls configured bail handler.
+#### Lifecycle Functions
 
-- Helpers:
-  - void *mulle_testallocator_stdlib_realloc( void *q, size_t size, struct mulle_allocator *allocator);
-    - Realloc wrapper suitable for intercepting stdlib calls when patching.
+- `void mulle_testallocator_initialize( void);`
+  - Registers the internal initializer via `mulle_atinit` at priority 1000000 (name `"**mulle_testallocator**"`). Safe to call more than once. On platforms with constructor support this runs automatically at load time.
+- `void mulle_testallocator_reset_detect_leaks( int detect);`
+  - If `detect` is non-zero, reports all still-tracked allocations as leaks on `stderr` (and bails unless suppressed), then clears the internal allocation/free sets. If `detect` is zero it just clears the sets. Mutex-protected.
+- `static inline void   mulle_testallocator_discard( void)`
+  - Shorthand for `mulle_testallocator_reset_detect_leaks( 0)`: start a clean sheet without checking leaks.
+- `static inline void   mulle_testallocator_reset( void)`
+  - Shorthand for `mulle_testallocator_reset_detect_leaks( 1)`: check leaks, then start a clean sheet.
+- `void mulle_testallocator_cancel( void);`
+  - Calls `discard()` and sets the trace level to "cancelled" (-2), which disables all further tracking. Call only at end of a test session; reinitialization afterwards is not supported.
 
-Notes:
-- The library exposes a global mulle_testallocator which can be assigned to mulle_default_allocator to replace the default allocator for testing (see struct comment in the struct header).
+#### Configuration & Control
+
+- `void mulle_testallocator_set_tracelevel( unsigned int value);`
+  - Sets tracing verbosity. Value `1` traces setup and exit, `2` additionally traces every allocation/deallocation, `4` adds stacktraces. A value of `-1` disables tracing (per header comment).
+- `void mulle_testallocator_set_max_size( size_t value);`
+  - If `value` is non-zero, any allocation request larger than `value` fails with `ENOMEM` (simulates out-of-memory). `0` turns the limit off.
+- `void mulle_testallocator_set_stacktracesymbolizer( void (*f)( void));`
+  - Sets a callback that parses/improves the backtrace strings printed when stacktrace tracing is enabled.
+
+#### Unlocked (internal) functions
+
+- `void _mulle_testallocator_reset( void);`
+  - Unlocked reset of the internal pointer sets; callers must hold the internal lock. Rarely useful.
+- `void _mulle_testallocator_detect_leaks( void);`
+  - Unlocked leak check over the allocations set; callers must hold the internal lock.
+
+#### Error Handling
+
+- `void mulle_testallocator_bail( void *p);`
+  - Default fatal-error handler: on non-Windows platforms calls `abort()` (on macOS with `MULLE_TESTALLOCATOR_HISTORY` set it first invokes `malloc_history`). It is the default value of `mulle_testallocator_config.bail`. It is also the `abafree` function of the `mulle_testallocator` instance.
+
+#### stdlib Support
+
+- `void *mulle_testallocator_stdlib_realloc( void *q,
+                                            size_t size,
+                                            struct mulle_allocator *allocator);`
+  - A `realloc` wrapper suitable for patching stdlib allocators (e.g. `mulle_stdlib_allocator.realloc`). If the pointer is NULL and scribbling is enabled, the new block is filled with `0xCAF3CAF3`.
+
+#### Testallocator Detection
+
+- `int mulle_allocator_is_testallocator( const struct mulle_allocator *p);`
+  - Returns `1` if the given `mulle_allocator` instance is `mulle_testallocator`, `0` otherwise. Returns `0` for NULL input. Compares the `calloc`, `realloc`, `free` and `fail` function pointers against the global instance.
+
+#### Environment Variables
+
+Configured during the automatic initializer run:
+
+| Variable | Effect |
+|---|---|
+| `MULLE_TESTALLOCATOR` | Activates the test allocator at startup; value is used as trace level (or truthy YES). |
+| `MULLE_TESTALLOCATOR_TRACE` | `1`: trace setup/exit. `2`: also trace allocations/deallocations. `3+`: add stacktraces (verbosity grows with value). Non-zero implicitly enables activation. |
+| `MULLE_TESTALLOCATOR_DONT_FREE` | If truthy, memory is tracked but never actually freed (can burn memory quickly, makes traces simpler). |
+| `MULLE_TESTALLOCATOR_DONT_SCRIBBLE` | If truthy, freed/new memory is not scribbled. |
+| `MULLE_TESTALLOCATOR_MAX_SIZE` | If set, allocations larger than this get `ENOMEM`. |
+| `MULLE_TESTALLOCATOR_LEAKS` | Leak mode bitmask: `1` = only report the first leak, `2` = do not bail on leaks. |
 
 ### 3.2. src/mulle-testallocator-struct.h
 
+```c
 struct _mulle_testallocator_config
-- Purpose: configuration/state for the test allocator.
-- Fields:
-   - void (*bail)( void *q);     // Bail vector called on fatal error
-   - int _windows;              // platform flag
-   - int patch_stdlib_scribble; // patch stdlib malloc to scribble
-   - int out_of_memory;         // set when OOM detected
-   - size_t max_size;           // maximum allocation size
-   - int dont_free;             // avoid reuse of freed areas
-   - int dont_scribble;         // avoid scribbling freed areas
-- Usage: modify mulle_testallocator_config before/after initialize to alter runtime behavior.
+{
+   void     (*bail)( void *q);
+   int      _windows;
+   int      patch_stdlib_scribble;  // if set, patches stdlib malloc to scribble memory
+   int      out_of_memory;
+   size_t   max_size;
+   int      dont_free;  // use this to avoid reuse of memory areas
+   int      dont_scribble;  // use this to avoid reuse of memory areas
+};
+```
+
+- **Purpose:** configuration and runtime state of the test allocator.
+- **Key Fields:**
+  - `bail`: the bail vector called on fatal errors (default `mulle_testallocator_bail`); must be first for mulle-objc patching ease.
+  - `_windows`: platform flag (set on `_WIN32`).
+  - `patch_stdlib_scribble`: if set, patch stdlib malloc to scribble memory.
+  - `out_of_memory`: set when an out-of-memory condition (via `max_size`) has been triggered; may then deny further allocations.
+  - `max_size`: maximum permitted allocation size (0 = unlimited).
+  - `dont_free`: avoid reuse of freed memory areas (doesn't really free).
+  - `dont_scribble`: avoid scribbling freed memory areas.
 
 ### 3.3. src/pointerarray.h
 
-struct _pointerarray
-- Purpose: simple growing array of pointers used for bookkeeping in tests.
-- Key fields: size_t count (non-null pointers), used, size, void **pointers.
-- Lifecycle:
-  - _pointerarray_alloc( calloc ) -> allocate structure
-  - _pointerarray_done/_pointerarray_free( free ) -> free inner array and struct
-- Core ops:
-  - _pointerarray_add( array, pointer, realloc ) -> append pointer (allows NULL entries)
-  - _pointerarray_get( array, index ) -> fetch pointer
-  - _pointerarray_index( array, p ) -> linear search index or -1
-  - _pointerarray_set( array, index, p ) -> set with count adjustment
-- Inspection:
-  - _pointerarray_count_non_null_pointers( array )
-- Enumeration:
-  - struct _pointerarray_enumerator + _pointerarray_enumerate/_pointerarray_enumerator_next/_done
+`struct _pointerarray` — a simple growing array of pointers, all-inlined, used for testing bookkeeping. Can store NULL pointers; the "no element" sentinel is `(void *) -1`.
 
-Complexity: append amortized O(1), get O(1), index O(n).
+```c
+struct _pointerarray
+{
+   size_t   count;
+   size_t   used;
+   size_t   size;
+   void     **pointers;
+};
+```
+
+- Key fields: `count` (number of non-NULL pointers), `used` (number of slots filled), `size` (current capacity), `pointers` (backing array).
+- **Lifecycle:**
+  - `static inline struct _pointerarray  *_pointerarray_alloc( void *(*calloc)( size_t, size_t))` — allocate the struct via the supplied `calloc`.
+  - `static inline void  _pointerarray_done( struct _pointerarray *array, void (*free)( void *))` — free the inner pointer array.
+  - `static inline void  _pointerarray_free( struct _pointerarray *array, void (*free)( void *))` — free array then struct.
+- **Core Operations:**
+  - `static inline int   _pointerarray_add( struct _pointerarray *array, void  *pointer, void *(*realloc)( void *, size_t))` — append a pointer (doubling growth, boosting `count`); returns `-1` and asserts on realloc failure.
+  - `static inline void  *_pointerarray_get( struct _pointerarray *array, unsigned int i)` — index lookup, asserts bounds.
+  - `static inline unsigned int   _pointerarray_index( struct _pointerarray *array, void *p)` — linear search; returns `(unsigned int) -1` if absent.
+  - `static inline void   _pointerarray_set( struct _pointerarray *array, unsigned int i, void *p)` — overwrite slot, maintaining the non-NULL `count`.
+  - `static inline size_t  _pointerarray_count_non_null_pointers( struct _pointerarray *array)` — returns `count`.
+- **Enumeration:**
+  - `static inline struct  _pointerarray_enumerator   _pointerarray_enumerate( struct _pointerarray *array)` — build an enumerator over all used slots.
+  - `static inline void   *_pointerarray_enumerator_next( struct _pointerarray_enumerator *rover)` — returns the next pointer, or `(void *) -1` when exhausted.
+  - `static inline void  _pointerarray_enumerator_done( struct _pointerarray_enumerator *rover)` — no-op, present for symmetry.
+  - `struct _pointerarray_enumerator { void **curr; void **sentinel; };`
+- Internal `_pointerarray_grow` doubles capacity.
 
 ### 3.4. src/pointerset.h
 
+`struct _pointerset` — an open-addressing, all-inlined hash set for pointers. Cannot store NULL or `(void *) -1`.
+
+```c
 struct _pointerset
-- Purpose: open-addressing hashset for pointers (cannot store NULL or (void *)-1).
-- Key fields: count, used, max, mask, void **pointers.
-- Lifecycle:
-  - _pointerset_create( calloc ) / _pointerset_init / _pointerset_done / _pointerset_free
-- Core ops:
-  - _pointerset_add/_pointerset_sureadd( set, pointer ) -> insert (returns pointer or NULL if present)
-  - _pointerset_get( set, pointer ) -> returns stored pointer or NULL
-  - _pointerset_remove( set, pointer ) -> remove entry
-  - Internals: _pointerset_grow handles resizing and rehashing
-- Enumeration via _pointerset_enumerator
+{
+   size_t   count;
+   size_t   used;
+   size_t   max;
+   size_t   mask;
+   void     **pointers;
+};
+```
 
-Complexity: average O(1) for add/get/remove; resizing O(n) amortized.
+- Key fields: `count` (active entries), `used` (non-tombstone slots), `max` (load threshold ~ half of capacity), `mask` (capacity - 1), `pointers` (backing array; NULL/`(void *)-1` are empty/tombstone).
+- **Lifecycle:**
+  - `static inline struct _pointerset  *_pointerset_create( void *(*calloc)( size_t, size_t))`
+  - `static inline void  _pointerset_init( struct _pointerset *set)`
+  - `static inline void  _pointerset_done( struct _pointerset *set, void (*free)( void *))`
+  - `static inline void  _pointerset_free( struct _pointerset *set, void (*free)( void *))`
+- **Core Operations:**
+  - `static inline void   *_pointerset_sureadd( struct _pointerset *set, void  *pointer)` — insert assuming capacity; returns the pointer, or NULL if already present.
+  - `static inline void   *_pointerset_add( struct _pointerset *set, void  *pointer, void *(*calloc)( size_t, size_t), void (*free)( void *))` — insert with possible growth; returns the pointer, NULL if present, `(void *) -1` on growth failure.
+  - `static inline void  *_pointerset_get( struct _pointerset *set, void *pointer)` — lookup; returns stored pointer or NULL.
+  - `static inline void  _pointerset_remove( struct _pointerset *set, void *pointer)` — tombstones the entry (`(void *) -1`) and decrements `count`.
+  - Internal `_pointerset_grow` doubles/re-hashes; usage `avalanche`/`avalanche32`/`avalanche64` (MurmurHash3-style) provide the hash.
+- **Enumeration:**
+  - `static inline struct  _pointerset_enumerator   _pointerset_enumerate( struct _pointerset *set)` — build an enumerator (handles NULL set/pointers gracefully).
+  - `static inline void   *_pointerset_enumerator_next( struct _pointerset_enumerator *rover)` — returns the next live pointer, or NULL when exhausted (skips NULL and tombstone slots).
+  - `static inline void  _pointerset_enumerator_done( struct _pointerset_enumerator *rover)` — no-op, present for symmetry.
+  - `struct _pointerset_enumerator { void **curr; void **sentinel; };`
 
-### 3.5. blockset.h
+### 3.5. blockset.h (repo root, experimental)
 
-struct _blockset and struct _block
-- Purpose: store (address, length) pairs; used to track allocated blocks (helps with realloc/size queries).
-- Key fields: struct _block { void *adr; size_t length; } and _blockset has count, used, max, mask, blocks.
-- Lifecycle and operations mirror pointerset semantics: create, init, add, get (returns noblock sentinel), remove, grow, enumerate.
-- Complexity: same as pointerset (hash table semantics).
+`struct _block { void *adr; size_t length; }` and `struct _blockset` implement a growing hash table mapping addresses to lengths (`size_t count, used, max, mask; struct _block *blocks;`), with API mirroring `_pointerset` (`_blockset_create/init/done/free`, `_blockset_add/get/remove/grow`, enumerator, sentinel `noblock`). It is located in the repository root, is **not part of the published `src/` set**, and its header comment marks it "Untested!" and slated for tracking allocation sizes on realloc. Treat it as a work-in-progress.
 
 ## 4. Performance Characteristics
 
-- pointerarray: append amortized O(1), random access O(1), linear search O(n).
-- pointerset/blockset: hash-table semantics, average O(1) for add/get/remove; worst-case O(n) if degenerate. Rehashing/growth is O(n) but amortized.
-- Memory: tracking structures keep additional metadata and pointer arrays; enabling dont_free/dont_scribble increases memory retention.
-- Thread-safety: not thread-safe. External synchronization required for concurrent tests.
+- The allocation/free path adds an open-addressing hash lookup (average O(1)) plus a mutex lock/unlock (`mulle_thread_mutex`) around the tracking sets, on top of the underlying `calloc`/`realloc`/`free`. This is a significant constant overhead; it is not suitable for production allocation hot paths, only for tests and debugging.
+- `pointerarray`: append amortized O(1) (doubling growth), indexed get O(1), `_pointerarray_index` linear O(n).
+- `pointerset`/`blockset`: hash table semantics, average O(1) add/get/remove; degenerate worst case O(n); growth re-hashes in O(n) amortized over inserts.
+- Memory: tracking stores one word per live allocation plus allocation doubling slack in the sets; enabling `dont_free`/`dont_scribble` retains or reuses freed memory and can grow memory usage quickly.
+- Thread-safety: the tracking operations (`test_calloc`, `test_realloc`, `test_free`) and `mulle_testallocator_reset_detect_leaks` are protected by an internal mutex, so concurrent allocator use on a single initialized instance is safe. Global configuration changes and `initialize` itself are not synchronized; do not reconfigure mid-flight from multiple threads. The inlined helper containers are not thread-safe at all.
 
 ## 5. AI Usage Recommendations & Patterns
 
-- Best practices:
-  - Always call mulle_testallocator_initialize() before using the allocator in tests.
-  - Use mulle_testallocator_reset() at test start to enable leak detection and get a clean state.
-  - Call mulle_testallocator_cancel() if you used discard and want to teardown internal resources.
-  - Prefer the exposed functions over touching internal structs. The inlined containers are convenience helpers for internal use.
-  - To globally replace the allocator for tests, assign mulle_default_allocator = mulle_testallocator (do so consistently and restore afterwards).
-- Common pitfalls:
-  - Do not assume thread-safety.
-  - Do not rely on internal symbols prefixed with `_` across library boundaries.
-  - When patching stdlib, take care with allocator semantics; use provided stdlib wrapper where appropriate.
+- **Best Practices:**
+  - Always `mulle_testallocator_initialize()` before any allocation goes through the test allocator. If initialization has not run, `may_alloc` asserts.
+  - Use the canonical manual pattern: `mulle_testallocator_initialize(); mulle_default_allocator = mulle_testallocator; { ...tests... } mulle_testallocator_reset();`.
+  - Bracket test sections with `mulle_testallocator_reset()` to print and clear leaks between tests rather than only at exit.
+  - Use `mulle_testallocator_discard()` to zero the tracking sets when a test intentionally leaks.
+  - For environment-var driven leak checking, run the binary with `MULLE_TESTALLOCATOR=YES` (no code changes needed); ensure the library is linked ahead of all other code with whole-archive / the `all-load` mark so its constructor isn't dropped.
+  - Use `mulle_allocator_is_testallocator()` to verify a given allocator pointer is the test allocator before assuming tracking is active.
+  - To detect where a leaked address came from, re-run with `MULLE_TESTALLOCATOR_TRACE=2` (or `3` for stacktraces) and search the trace for the leaked address.
+- **Common Pitfalls:**
+  - Do not search for `mulle_testallocator_done()`; it does not exist. Teardown is `mulle_testallocator_cancel()`, and only once.
+  - Do not rely on the `_`-prefixed functions (`_mulle_testallocator_reset`, `_mulle_testallocator_detect_leaks`): they require the internal lock.
+  - `(void *) -1` is a sentinel in both `pointerarray` and `pointerset`; NULL and `(void *) -1` cannot be stored in a `pointerset`.
+  - When freeing, use the same allocator the block came from; freeing a pointer never returned by the test allocator triggers a "false free" bail.
+  - stdlib `malloc` calls are invisible to the allocator's leak check unless you patch the stdlib realloc (`mulle_stdlib_allocator.realloc = mulle_testallocator_stdlib_realloc;`).
+  - `mulle_testallocator_initialize()` relies on `mulle_atinit` + `_mulle_atexit` + a C constructor; without constructor support or the `all-load` link mark, activation silently does not happen.
+- **Idiomatic Usage:** Follow the tests in `test/checks/` (`goodfree.c`, `leak.c`, `badfree.c`, `doublefree.c`, `scribble.c`). They all use the manual initialize/swap/reset pattern so they work even when the compiler lacks constructor support.
 
 ## 6. Integration Examples
 
-### Example 1: Initialize test allocator and enable tracing
+Coding style: 3-space indent, Allman braces, aligned declarations, C89 variable rules, `return( expr);`.
+
+### Example 1: Manual leak and double-free checking with the default allocator
 
 ```c
-#include "mulle-testallocator.h"
+#include <mulle-allocator/mulle-allocator.h>
+#include <mulle-testallocator/mulle-testallocator.h>
 
-int
-main( void)
+static void  run_test( void)
+{
+   void  *p;
+
+   p = mulle_malloc( 1848);
+   mulle_free( p);
+}
+
+//
+// run tests in manual mode, since the compiler might not support constructors
+//
+int  main( int argc, char *argv[])
 {
    mulle_testallocator_initialize();
-   mulle_testallocator_set_tracelevel( 2);
-   /* optionally limit allocation sizes (0 disables): */
-   mulle_testallocator_set_max_size( 0);
-
-   /* Run tests that allocate via the default allocator. Optionally:
-      mulle_default_allocator = mulle_testallocator; */
-
-   /* enable leak detection for the run */
-   mulle_testallocator_reset();
-
-   /* ... run test code ... */
-
-   mulle_testallocator_cancel();
-   return(0);
-}
-```
-
-### Example 2: Disable leak checking for a test section (discard)
-
-```c
-#include "mulle-testallocator.h"
-
-void
-some_test_section( void)
-{
-   mulle_testallocator_discard(); /* do not detect leaks here */
-
-   /* code that intentionally leaks for the test */
-
-   /* restore detection for subsequent tests */
-   mulle_testallocator_reset();
-}
-```
-
-### Example 3: Using _pointerarray (internal helper) to collect pointers
-
-```c
-#include <stdlib.h>
-#include "pointerarray.h"
-
-int
-main( void)
-{
-   struct _pointerarray  *arr;
-   void                  *p;
-   struct _pointerarray_enumerator  en;
-
-   arr = _pointerarray_alloc( calloc);
-
-   p = malloc( 16);
-   _pointerarray_add( arr, p, realloc);
-
-   en = _pointerarray_enumerate( arr);
-   while( (p = _pointerarray_enumerator_next( &en)) != (void *) -1)
+   mulle_default_allocator = mulle_testallocator;
    {
-      /* use p */
+      run_test();
    }
-   _pointerarray_enumerator_done( &en);
-
-   _pointerarray_free( arr, free);
+   mulle_testallocator_reset();
    return( 0);
 }
 ```
 
-## 7. Dependencies
+A "double free" (freeing `p` twice) or "false free" (freeing a string literal) makes the program print e.g. `###\n### double free: 0x...` and bail (abort). A leaked block prints `### leak 0x...` at `mulle_testallocator_reset()`.
 
-- Direct runtime/build dependencies (from README):
-  - mulle-allocator (core allocation abstractions)
-  - mulle-atinit (constructor/initializer helpers)
-  - mulle-dlfcn (shared library helper, optional for dynamic symbolization)
-  - mulle-stacktrace (optional; used to collect/format backtraces)
-  - mulle-thread (used by some platform helpers)
-
-- Typical usage: include mulle-testallocator alongside mulle-allocator and link it early so constructor activation works.
-
-
----
-
-Notes for an AI:
-- Primary API surfaces: mulle_testallocator_initialize(), mulle_testallocator_reset(), configuration via mulle_testallocator_config, and the exported mulle_testallocator allocator object.
-- For concrete usage, prefer the test examples in test/checks/; they demonstrate manual initialization and environment-driven modes.
- The core concept is to provide an allocator, `mulle_testallocator`, that conforms to the `struct mulle_allocator` interface. This allows it to be seamlessly swapped with the default allocator.
-- **Allocation Tracking:** The test allocator maintains a thread-safe internal set of all currently active memory allocations. When `malloc` is called, a record is added; when `free` is called, the corresponding record is removed.
-- **Automatic Activation:** The library can be activated automatically at program startup by setting the `MULLE_TESTALLOCATOR=YES` environment variable. It uses a constructor function to replace the `mulle_default_allocator` and an `atexit` handler to print the leak report upon termination.
-- **Fail-Fast on Errors:** For errors like double frees or bad frees, the library's philosophy is to abort immediately. This stops the program at the exact point of the error, making it much easier to debug than continuing with corrupted memory.
-- **Tracing and Debugging:** Verbose tracing can be enabled via environment variables (`MULLE_TESTALLOCATOR_TRACE`) to see every allocation and deallocation, optionally including stack traces, which is invaluable for pinpointing the source of leaks.
-
-## 3. Core API & Data Structures
-
-The library's main interaction point is the `mulle_testallocator` instance and a set of control functions.
-
-### 3.1. `mulle-testallocator.h`
-
-#### Global Allocator Instance
-- `mulle_testallocator`: A global instance of `struct mulle_allocator` that provides the memory debugging functionality. It can be assigned to `mulle_default_allocator` to enable tracking for all code using the default allocator.
-
-#### Manual Control Functions
-- `mulle_testallocator_initialize()`: Initializes the internal data structures of the test allocator. This is called automatically by the constructor when using environment variable activation.
-- `mulle_testallocator_reset()`: Checks for leaks among the currently tracked allocations, prints a report to `stderr`, and then clears the internal tracking set. This is useful for checking for leaks within a specific section of code without waiting for the program to exit.
-- `mulle_testallocator_done()`: Releases all resources held by the test allocator itself. This is called automatically by the `atexit` handler.
-
-#### Environment Variables (for configuration)
-- `MULLE_TESTALLOCATOR=YES`: Activates the test allocator for the entire program run.
-- `MULLE_TESTALLOCATOR_TRACE=[1,2,3+]`: Enables tracing of allocations and deallocations.
-  - `1`: Traces setup and exit.
-  - `2`: Also traces every allocation and free.
-  - `3+`: Also includes a stack trace for each operation.
-- `MULLE_TESTALLOCATOR_DONT_FREE=YES`: Allocations are tracked, but the underlying memory is never actually freed. This can help simplify traces but will consume memory rapidly.
-- `MULLE_TESTALLOCATOR_FIRST_LEAK=YES`: If set, the leak report will stop after the first leak is found.
-
-## 4. Performance Characteristics
-
-- **Overhead:** The test allocator introduces significant performance and memory overhead compared to a standard allocator. Each allocation and deallocation requires locking a mutex, hash map lookups, and storing metadata. It is **not** suitable for use in production code.
-- **Memory Usage:** Memory usage is substantially higher than normal, as metadata (including file, line, function name, and optionally a stack trace) is stored for every single allocation.
-- **Thread-Safety:** The library is fully thread-safe. All access to the internal tracking data is protected by a mutex.
-
-## 5. AI Usage Recommendations & Patterns
-
-- **Activation:** The easiest way to use the library is to link it and run the program with `MULLE_TESTALLOCATOR=YES`. No code changes are required if the program already uses `mulle_allocator`.
-- **Linking:** For automatic activation to work correctly, `mulle-testallocator` should be linked early, and the linker must be instructed to load the entire static archive to prevent the constructor from being optimized away.
-  - **mulle-sde:** Use the `all-load` mark.
-  - **Linux:** `-Wl,--whole-archive -lmulle-testallocator -Wl,--no-whole-archive`
-- **Manual Scoping:** To check for leaks in a specific part of the code, bracket the code with `mulle_default_allocator = mulle_testallocator;` and `mulle_testallocator_reset();`. Remember to restore the original allocator afterward.
-- **Debugging Leaks:** When a leak is reported, the address of the leaked block is printed. To find where it was allocated, re-run with `MULLE_TESTALLOCATOR_TRACE=3`. Then, search the trace output for the leaked address to find the stack trace of its allocation site.
-
-## 6. Integration Examples
-
-### Example 1: Automatic Leak Detection
-
-This example shows a program with an intentional memory leak. No special code is needed; the leak is detected by running with the environment variable.
-*Source: `test/checks/leak.c`*
+### Example 2: Environment-variable driven leak detection with stdlib scribbling
 
 ```c
 #include <mulle-allocator/mulle-allocator.h>
-
-int main(void)
-{
-    // This allocation is never freed.
-    mulle_malloc(16);
-
-    return 0;
-}
-```
-
-**Execution and Output:**
-```sh
-$ MULLE_TESTALLOCATOR=YES ./my_program
-mulle_testallocator: *** Leaked 1 block(s) (16 bytes) ***
-mulle_testallocator: [1] 0x... (16 bytes) leaked
-```
-
-### Example 2: Detecting a Double Free
-
-This program attempts to free the same memory block twice. `mulle-testallocator` will detect this and abort immediately.
-*Source: `test/checks/doublefree.c`*
-
-```c
-#include <mulle-allocator/mulle-allocator.h>
-
-int main(void)
-{
-    void *p = mulle_malloc(16);
-    mulle_free(p);
-
-    // This second free will cause the program to abort.
-    mulle_free(p);
-
-    return 0;
-}
-```
-**Execution and Output:**
-```sh
-$ MULLE_TESTALLOCATOR=YES ./my_program
-mulle_testallocator: *** pointer 0x... was already freed ***
-Abort trap: 6
-```
-
-### Example 3: Manual Leak Checking with `reset`
-
-This example demonstrates how to check for leaks within a specific scope, which is useful for unit tests.
-*Source: `README.md`*
-```c
 #include <mulle-testallocator/mulle-testallocator.h>
-#include <mulle-allocator/mulle-allocator.h>
-#include <stdio.h>
 
-void function_with_a_leak(void)
+int  main( int argc, char *argv[])
 {
-    mulle_malloc(32);
-}
+   void  *p;
 
-int main(void)
-{
-    struct mulle_allocator *original_allocator;
+   mulle_testallocator_initialize();
 
-    // Setup test allocator for a specific scope
-    mulle_testallocator_initialize();
-    original_allocator = mulle_default_allocator;
-    mulle_default_allocator = &mulle_testallocator;
+   mulle_default_allocator        = mulle_testallocator;
+   mulle_stdlib_allocator.realloc = mulle_testallocator_stdlib_realloc;
 
-    printf("--- Checking for leaks in function_with_a_leak ---
-");
-    function_with_a_leak();
-    // reset() will print the leak report here
-    mulle_testallocator_reset();
-    printf("--- Check finished ---
+   p = mulle_allocator_malloc( &mulle_stdlib_allocator, 16);
+   mulle_allocator_free( &mulle_stdlib_allocator, p);
 
-");
-
-    // Restore original allocator
-    mulle_default_allocator = original_allocator;
-    mulle_testallocator_done();
-
-    return 0;
+   mulle_testallocator_reset();
+   return( 0);
 }
 ```
 
+Run with `MULLE_TESTALLOCATOR=YES MULLE_TESTALLOCATOR_TRACE=2 ./executable` to see every alloc/free, and `MULLE_TESTALLOCATOR_TRACE=3` to add stacktraces for leak attribution.
+
+### Example 3: Checking whether an allocator is the test allocator
+
+```c
+#include <mulle-allocator/mulle-allocator.h>
+#include <mulle-testallocator/mulle-testallocator.h>
+
+int  main( int argc, char *argv[])
+{
+   int  is_test;
+
+   mulle_testallocator_initialize();
+   mulle_default_allocator = mulle_testallocator;
+
+   is_test = mulle_allocator_is_testallocator( &mulle_default_allocator);
+   printf( "default allocator is test allocator: %d\n", is_test);
+
+   mulle_testallocator_reset();
+   return( 0);
+}
+```
+
+The function safely returns `0` for NULL input and for any other allocator instance.
+
 ## 7. Dependencies
 
-- `mulle-allocator`
-- `mulle-atinit`
-- `mulle-atexit`
-- `mulle-stacktrace`
-- `mulle-thread`
+Direct `mulle-sde` dependencies (from `.mulle/etc/sourcetree/config` and `clib.json`):
+
+- `mulle-allocator` (mulle-c) — defines `struct mulle_allocator`, `mulle_allocator_default`, `mulle_stdlib_allocator`
+- `mulle-thread` (mulle-concurrent) — mutex and thread-once helpers
+- `mulle-atinit` — deterministic initializer registration
+- `mulle-atexit` — atexit registration for the leak report
+- `mulle-stacktrace` — backtrace capture/formatting for tracing
+- `mulle-dlfcn` — dynamic symbol lookup (`mulle_dlsym_exe`) for optional runtime resolution
