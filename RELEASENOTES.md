@@ -1,9 +1,15 @@
-### 6.2.0
+## 6.2.0
 
-* new `mulle_allocator_is_testallocator()` API to detect the test allocator
-* refresh mulle-sde build tooling and configuration
-* correct copyright headers and add missing license text
 
-### 6.1.1
+feature: add function to detect the test allocator
 
-Various small improvements
+* new ``mulle_allocator_is_testallocator()`` API to check if a given ``mulle_allocator`` instance is the test allocator
+* returns 1 for the test allocator, 0 otherwise, and safely handles NULL input
+
+
+
+
+
+* source files now consistently reference mulle-testallocator project
+* BSD license header added to files that were missing it
+* copyright years updated to reflect actual project origins

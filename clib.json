@@ -1,12 +1,12 @@
 {
    "name" : "mulle-testallocator",
-   "version" : "6.1.1",
+   "version" : "6.2.0",
    "description" : "🔄 C memory leak and double free checking",
    "keywords" : [],
    "license" : "BSD-3-Clause",
    "repo" : "mulle-core/mulle-testallocator",
    "src" : [
-      "asset/dox/TOC.md",
+      "asset/dox/api/toc/index.md",
       "src/generic/include-private.h",
       "src/generic/include.h",
       "src/mulle-testallocator-standalone.c",
