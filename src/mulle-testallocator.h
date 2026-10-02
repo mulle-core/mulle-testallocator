@@ -40,7 +40,7 @@
 
 #include "mulle-testallocator-struct.h"
 
-#define MULLE__TESTALLOCATOR_VERSION    ((6UL << 20) | (2 << 8) | 0)
+#define MULLE__TESTALLOCATOR_VERSION    ((6UL << 20) | (2 << 8) | 1)
 
 MULLE__TESTALLOCATOR_GLOBAL struct _mulle_testallocator_config   mulle_testallocator_config;
 MULLE__TESTALLOCATOR_GLOBAL struct mulle_allocator               mulle_testallocator;
@@ -98,9 +98,10 @@ MULLE__TESTALLOCATOR_GLOBAL
 void   mulle_testallocator_bail( void *p);
 
 MULLE__TESTALLOCATOR_GLOBAL
-void   *mulle_testallocator_stdlib_realloc( void *q,
-                                            size_t size,
-                                            struct mulle_allocator *allocator);
+void   *mulle_testallocator_stdlib_reallocarray( void *q,
+                                                 size_t n,
+                                                 size_t size,
+                                                 struct mulle_allocator *allocator);
 
 
 

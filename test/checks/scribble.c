@@ -64,14 +64,14 @@ static void   run_test_malloc_stdlib( void)
 // constructors
 //
 MULLE__TESTALLOCATOR_GLOBAL
-void   *mulle_testallocator_stdlib_realloc( void *q, size_t size, struct mulle_allocator *allocator);
+void   *mulle_testallocator_stdlib_reallocarray( void *q, size_t n, size_t size, struct mulle_allocator *allocator);
 
 int  main( int argc, char *argv[])
 {
    mulle_testallocator_initialize();
 
    mulle_default_allocator        = mulle_testallocator;
-   mulle_stdlib_allocator.realloc = mulle_testallocator_stdlib_realloc;
+   mulle_stdlib_allocator.reallocarray = mulle_testallocator_stdlib_reallocarray;
    {
       printf( "malloc default\n");
       run_test_malloc_default();

@@ -273,13 +273,23 @@ static void   reused_pointer_assert( void *p)
 // }
 
 
-static void  *test_realloc( void *q, size_t size, struct mulle_allocator *unused)
+static void  *test_reallocarray( void *q, size_t n, size_t size, struct mulle_allocator *unused)
 {
    void     *p;
    void     *old;
+   size_t   total;
 //   size_t   old_size;
 
-   if( ! may_alloc( size))
+   // zero size and overflow are programmer errors, exactly as in the default
+   // reallocarray vector
+   if( ! n || ! size)
+      mulle_allocation_fail( unused, NULL, 0);
+   if( size > (size_t) -1 / n)
+      mulle_allocation_fail( unused, NULL, (size_t) -1);
+
+   total = n * size;
+
+   if( ! may_alloc( total))
    {
       errno = ENOMEM;
       return( NULL);
@@ -293,7 +303,7 @@ static void  *test_realloc( void *q, size_t size, struct mulle_allocator *unused
       {
          if( mulle_thread_mutex_lock( &local.alloc_lock))
          {
-            perror( "mulle-test-allocator test_realloc() doing mulle_thread_mutex_lock:");
+            perror( "mulle-test-allocator test_reallocarray() doing mulle_thread_mutex_lock:");
             abort();
          }
 
@@ -316,14 +326,14 @@ static void  *test_realloc( void *q, size_t size, struct mulle_allocator *unused
    //
 
 
-   p = realloc( q, size);
+   p = realloc( q, total);
    if( p)
    {
       if( local.trace != mulle_testallocator_trace_cancelled)
       {
          if( mulle_thread_mutex_lock( &local.alloc_lock))
          {
-            perror( "mulle-test-allocator test_realloc() doing mulle_thread_mutex_lock:");
+            perror( "mulle-test-allocator test_reallocarray() doing mulle_thread_mutex_lock:");
             abort();
          }
 
@@ -332,7 +342,7 @@ static void  *test_realloc( void *q, size_t size, struct mulle_allocator *unused
             if( ! mulle_testallocator_config.dont_scribble)
             {
                // keep upper and lower bit sets of each byte
-               mulle_memset_uint32( p, 0xF3A7F3A7,size);
+               mulle_memset_uint32( p, 0xF3A7F3A7,total);
             }
 
             // just a normal malloc
@@ -362,10 +372,10 @@ static void  *test_realloc( void *q, size_t size, struct mulle_allocator *unused
    {
       if( q) // analyzer, just a print of the old address
          log_stacktrace( "realloced %p -> %p-%p",
-                  q, p, &((char *)p)[ size ? size - 1 : 0]);
+                  q, p, &((char *)p)[ total ? total - 1 : 0]);
       else
          log_stacktrace( "alloced %p-%p",
-                  p, &((char *)p)[ size ? size - 1 : 0]);
+                  p, &((char *)p)[ total ? total - 1 : 0]);
    }
    return( p);
 }
@@ -461,13 +471,12 @@ static void  test_free( void *p, struct mulle_allocator *unused)
 
 struct mulle_allocator   mulle_testallocator =
 {
-   .calloc  = test_calloc,
-   .realloc = test_realloc,
-   .free    = test_free,
-   .fail    = mulle_allocation_fail,
-   .abafree = (mulle_allocator_aba_t *)  (void *) abort
+   .calloc       = test_calloc,
+   .reallocarray = test_reallocarray,
+   .free         = test_free,
+   .fail         = mulle_allocation_fail,
+   .abafree      = (mulle_allocator_aba_t *)  (void *) abort
 };
-
 
 
 int   mulle_allocator_is_testallocator( const struct mulle_allocator *p)
@@ -476,7 +485,7 @@ int   mulle_allocator_is_testallocator( const struct mulle_allocator *p)
       return( 0);
    if( p->calloc != mulle_testallocator.calloc)
       return( 0);
-   if( p->realloc != mulle_testallocator.realloc)
+   if( p->reallocarray != mulle_testallocator.reallocarray)
       return( 0);
    if( p->free != mulle_testallocator.free)
       return( 0);
@@ -604,20 +613,29 @@ static void   trace_log_pointer( char *s, void *pointer)
 //
 // TODO: MULLE_C_CONSTRUCTOR doesn't work with non-clang compilers
 //
-void   *mulle_testallocator_stdlib_realloc( void *q,
-                                            size_t size,
-                                            struct mulle_allocator *allocator)
+void   *mulle_testallocator_stdlib_reallocarray( void *q,
+                                                 size_t n,
+                                                 size_t size,
+                                                 struct mulle_allocator *allocator)
 {
+   size_t   total;
    void     *p;
 //   size_t   old_size;
 
+   if( ! n || ! size)
+      mulle_allocation_fail( allocator, NULL, 0);
+   if( size > (size_t) -1 / n)
+      mulle_allocation_fail( allocator, NULL, (size_t) -1);
+
+   total = n * size;
+
    if( q || mulle_testallocator_config.dont_scribble)
-      return( realloc( q, size));
+      return( realloc( q, total));
 
 //   old_size = q ? _get_allocation_size( q) : 0;
-   p = realloc( q, size);
+   p = realloc( q, total);
    if( p)
-      mulle_memset_uint32( p, 0xCAF3CAF3, size);
+      mulle_memset_uint32( p, 0xCAF3CAF3, total);
    return( p);
 }
 
@@ -777,11 +795,11 @@ static void   _mulle_testallocator_initialize( void *unused)
       //       dynamic within mulle-core. If we are static we have no problems
       //       anway. Mixed mode though is not gonna happen.
       mulle_allocator_default.calloc        = test_calloc;
-      mulle_allocator_default.realloc       = test_realloc;
+      mulle_allocator_default.reallocarray  = test_reallocarray;
       mulle_allocator_default.free          = test_free;
 
-      mulle_allocator_stdlib.realloc        = mulle_testallocator_stdlib_realloc;
-      mulle_allocator_stdlib_nofree.realloc = mulle_testallocator_stdlib_realloc;
+      mulle_allocator_stdlib.reallocarray        = mulle_testallocator_stdlib_reallocarray;
+      mulle_allocator_stdlib_nofree.reallocarray = mulle_testallocator_stdlib_reallocarray;
 
       trace_log_pointer( "install atexit \"mulle_testallocator_exit\"", (void *) mulle_testallocator_exit);
 
