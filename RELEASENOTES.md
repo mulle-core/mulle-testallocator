@@ -3,6 +3,12 @@
 
 
 
+
+
+
+
+
+
 feature: switch test allocator to the reallocarray vector
 
 * **BREAKING**: ``mulle_testallocator_stdlib_realloc()`` is replaced by ``mulle_testallocator_stdlib_reallocarray(` void *q, `size_t` n, `size_t` size, struct `mulle_allocator` *)`
